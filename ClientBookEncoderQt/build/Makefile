@@ -67,10 +67,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt
+CMAKE_SOURCE_DIR = /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build
+CMAKE_BINARY_DIR = /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -99,9 +99,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build/CMakeFiles /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -141,6 +141,87 @@ ApplicBooker: cmake_check_build_system
 ApplicBooker/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/build
 .PHONY : ApplicBooker/fast
+
+src/Client.o: src/Client.cpp.o
+
+.PHONY : src/Client.o
+
+# target to build an object file
+src/Client.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Client.cpp.o
+.PHONY : src/Client.cpp.o
+
+src/Client.i: src/Client.cpp.i
+
+.PHONY : src/Client.i
+
+# target to preprocess a source file
+src/Client.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Client.cpp.i
+.PHONY : src/Client.cpp.i
+
+src/Client.s: src/Client.cpp.s
+
+.PHONY : src/Client.s
+
+# target to generate assembly for a file
+src/Client.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Client.cpp.s
+.PHONY : src/Client.cpp.s
+
+src/Serveur.o: src/Serveur.cpp.o
+
+.PHONY : src/Serveur.o
+
+# target to build an object file
+src/Serveur.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.o
+.PHONY : src/Serveur.cpp.o
+
+src/Serveur.i: src/Serveur.cpp.i
+
+.PHONY : src/Serveur.i
+
+# target to preprocess a source file
+src/Serveur.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.i
+.PHONY : src/Serveur.cpp.i
+
+src/Serveur.s: src/Serveur.cpp.s
+
+.PHONY : src/Serveur.s
+
+# target to generate assembly for a file
+src/Serveur.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.s
+.PHONY : src/Serveur.cpp.s
+
+src/TCP.o: src/TCP.cpp.o
+
+.PHONY : src/TCP.o
+
+# target to build an object file
+src/TCP.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o
+.PHONY : src/TCP.cpp.o
+
+src/TCP.i: src/TCP.cpp.i
+
+.PHONY : src/TCP.i
+
+# target to preprocess a source file
+src/TCP.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/TCP.cpp.i
+.PHONY : src/TCP.cpp.i
+
+src/TCP.s: src/TCP.cpp.s
+
+.PHONY : src/TCP.s
+
+# target to generate assembly for a file
+src/TCP.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/TCP.cpp.s
+.PHONY : src/TCP.cpp.s
 
 src/main.o: src/main.cpp.o
 
@@ -232,6 +313,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... ApplicBooker"
+	@echo "... src/Client.o"
+	@echo "... src/Client.i"
+	@echo "... src/Client.s"
+	@echo "... src/Serveur.o"
+	@echo "... src/Serveur.i"
+	@echo "... src/Serveur.s"
+	@echo "... src/TCP.o"
+	@echo "... src/TCP.i"
+	@echo "... src/TCP.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

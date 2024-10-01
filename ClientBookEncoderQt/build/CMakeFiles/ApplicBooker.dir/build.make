@@ -62,10 +62,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt
+CMAKE_SOURCE_DIR = /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build
+CMAKE_BINARY_DIR = /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/ApplicBooker.dir/depend.make
@@ -76,47 +76,89 @@ include CMakeFiles/ApplicBooker.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/ApplicBooker.dir/flags.make
 
+CMakeFiles/ApplicBooker.dir/src/Client.cpp.o: CMakeFiles/ApplicBooker.dir/flags.make
+CMakeFiles/ApplicBooker.dir/src/Client.cpp.o: ../src/Client.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ApplicBooker.dir/src/Client.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ApplicBooker.dir/src/Client.cpp.o -c /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/Client.cpp
+
+CMakeFiles/ApplicBooker.dir/src/Client.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ApplicBooker.dir/src/Client.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/Client.cpp > CMakeFiles/ApplicBooker.dir/src/Client.cpp.i
+
+CMakeFiles/ApplicBooker.dir/src/Client.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ApplicBooker.dir/src/Client.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/Client.cpp -o CMakeFiles/ApplicBooker.dir/src/Client.cpp.s
+
+CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.o: CMakeFiles/ApplicBooker.dir/flags.make
+CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.o: ../src/Serveur.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.o -c /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/Serveur.cpp
+
+CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/Serveur.cpp > CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.i
+
+CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/Serveur.cpp -o CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.s
+
+CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o: CMakeFiles/ApplicBooker.dir/flags.make
+CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o: ../src/TCP.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o -c /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/TCP.cpp
+
+CMakeFiles/ApplicBooker.dir/src/TCP.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ApplicBooker.dir/src/TCP.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/TCP.cpp > CMakeFiles/ApplicBooker.dir/src/TCP.cpp.i
+
+CMakeFiles/ApplicBooker.dir/src/TCP.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ApplicBooker.dir/src/TCP.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/TCP.cpp -o CMakeFiles/ApplicBooker.dir/src/TCP.cpp.s
+
 CMakeFiles/ApplicBooker.dir/src/main.cpp.o: CMakeFiles/ApplicBooker.dir/flags.make
 CMakeFiles/ApplicBooker.dir/src/main.cpp.o: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ApplicBooker.dir/src/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ApplicBooker.dir/src/main.cpp.o -c /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ApplicBooker.dir/src/main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ApplicBooker.dir/src/main.cpp.o -c /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/main.cpp
 
 CMakeFiles/ApplicBooker.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ApplicBooker.dir/src/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/src/main.cpp > CMakeFiles/ApplicBooker.dir/src/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/main.cpp > CMakeFiles/ApplicBooker.dir/src/main.cpp.i
 
 CMakeFiles/ApplicBooker.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ApplicBooker.dir/src/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/src/main.cpp -o CMakeFiles/ApplicBooker.dir/src/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/main.cpp -o CMakeFiles/ApplicBooker.dir/src/main.cpp.s
 
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: CMakeFiles/ApplicBooker.dir/flags.make
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: ../src/mainwindowclientbookencoder.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o -c /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/src/mainwindowclientbookencoder.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o -c /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/mainwindowclientbookencoder.cpp
 
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/src/mainwindowclientbookencoder.cpp > CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/mainwindowclientbookencoder.cpp > CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.i
 
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/src/mainwindowclientbookencoder.cpp -o CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/mainwindowclientbookencoder.cpp -o CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.s
 
 CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.o: CMakeFiles/ApplicBooker.dir/flags.make
 CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.o: ../src/moc_mainwindowclientbookencoder.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.o -c /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/src/moc_mainwindowclientbookencoder.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.o -c /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/moc_mainwindowclientbookencoder.cpp
 
 CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/src/moc_mainwindowclientbookencoder.cpp > CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/moc_mainwindowclientbookencoder.cpp > CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.i
 
 CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/src/moc_mainwindowclientbookencoder.cpp -o CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/moc_mainwindowclientbookencoder.cpp -o CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.s
 
 # Object files for target ApplicBooker
 ApplicBooker_OBJECTS = \
+"CMakeFiles/ApplicBooker.dir/src/Client.cpp.o" \
+"CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.o" \
+"CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o" \
 "CMakeFiles/ApplicBooker.dir/src/main.cpp.o" \
 "CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o" \
 "CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.o"
@@ -124,6 +166,9 @@ ApplicBooker_OBJECTS = \
 # External object files for target ApplicBooker
 ApplicBooker_EXTERNAL_OBJECTS =
 
+ApplicBooker: CMakeFiles/ApplicBooker.dir/src/Client.cpp.o
+ApplicBooker: CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.o
+ApplicBooker: CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o
 ApplicBooker: CMakeFiles/ApplicBooker.dir/src/main.cpp.o
 ApplicBooker: CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o
 ApplicBooker: CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.o
@@ -132,7 +177,7 @@ ApplicBooker: /usr/lib64/libQt5Widgets.so.5.12.5
 ApplicBooker: /usr/lib64/libQt5Gui.so.5.12.5
 ApplicBooker: /usr/lib64/libQt5Core.so.5.12.5
 ApplicBooker: CMakeFiles/ApplicBooker.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable ApplicBooker"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable ApplicBooker"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ApplicBooker.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -145,6 +190,6 @@ CMakeFiles/ApplicBooker.dir/clean:
 .PHONY : CMakeFiles/ApplicBooker.dir/clean
 
 CMakeFiles/ApplicBooker.dir/depend:
-	cd /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build/CMakeFiles/ApplicBooker.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles/ApplicBooker.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ApplicBooker.dir/depend
 

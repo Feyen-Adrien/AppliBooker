@@ -1,4 +1,4 @@
-# Install script for directory: /home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt
+# Install script for directory: /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/student/HEPL2024-2025/RTI/Labo/Eval1/Booker/ClientBookEncoderQt/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
