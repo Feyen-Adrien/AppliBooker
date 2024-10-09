@@ -16,18 +16,11 @@ using namespace std;
 
 #define TAILLE_MAX_DATA 10000
 
-class SocketLib{
-	public:
-		SocketLib();
-		~SocketLib();
+int ServerSocket(int bearing);
+int Accept(int sEcoute,char *ipClient);
+int ClientSocket(char* ipServeur, int portServeur);
+int Send(int sSocket,char* data,int taille);
+int Receive(int sSocket,char* data);
 
-
-		int ServerSocket(int bearing);
-		int Accept(int sEcoute,char *ipClient);
-		int ClientSocket(char* ipServeur, int portServeur);
-		int Send(int sSocket,char* data,int taille);
-		int Receive(int sSocket,char* data);
-
-};
 
 #endif

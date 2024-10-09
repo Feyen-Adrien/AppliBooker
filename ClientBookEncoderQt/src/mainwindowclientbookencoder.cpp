@@ -4,7 +4,17 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <iostream>
+#include "TCP.h"
+#include "OBEP.h"
 using namespace std;
+
+int sClient;
+char IpServeur[50] = "0.0.0.0";
+
+bool OBEP_Login_Client(const char* user, const char* password);
+void OBEP_Logout();
+void OBEP_Operation(char op);
+void Echange(char* requete,char* reponse);
 
 MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
     : QMainWindow(parent)
@@ -31,16 +41,13 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
 
     this->logoutOk();
 
-    // Exemples d'utilisation (à supprimer)
-    this->addTupleTableBooks(1,"Les Thanatonautes","Bernard Werber","Science-Fiction","978-2253139225",505,1999,9.7f,3);
-    this->addTupleTableBooks(6,"Dune","Frank Herbert","Science-Fiction","978-2266320481",929,2021,11.95f,13);
-    this->addTupleTableBooks(13,"Le silence des agneaux","Thomas Harris","Thriller","978-2266208949",377,2015,7.7f,17);
-
-    this->addComboBoxAuthors("Bernard Werber");
-    this->addComboBoxAuthors("Dan Brown");
-
-    this->addComboBoxSubjects("Roman");
-    this->addComboBoxSubjects("Science-fiction");
+    // Connexion sur le serveur
+    if((sClient = ClientSocket(IpServeur,50000))==-1)
+    {
+        perror("Erreur de ClientSocket");
+        exit(1);
+    }
+    printf("Client connecté sur le serveur.\n");
 }
 
 MainWindowClientBookEncoder::~MainWindowClientBookEncoder() {
@@ -267,13 +274,96 @@ void MainWindowClientBookEncoder::on_pushButtonClear_clicked() {
 void MainWindowClientBookEncoder::on_actionLogin_triggered() {
     string login = this->dialogInputText("Entrée en session","Login ?");
     string password = this->dialogInputText("Entrée en session","Password ?");
+    //envoyer au serveur la commande
+    if(!OBEP_Login_Client(login.c_str(),password.c_str()))
+    {
+        this->dialogError("LOGIN","Mauvais identifiants !");
+    }
     this->loginOk();
 }
 
 void MainWindowClientBookEncoder::on_actionLogout_triggered() {
+    // envoyer au serveur la commande
+    OBEP_Logout();
     this->logoutOk();
+    
+    
 }
 
 void MainWindowClientBookEncoder::on_actionQuitter_triggered(){
     QApplication::exit(0);
 }
+
+
+
+
+// gestion du protocole OBEP
+
+bool OBEP_Login_Client(const char* user,const char* password)
+{
+    char requete[200],reponse[200];
+    bool onContinue = true;
+
+    // Construction de la requête 
+    sprintf(requete,"LOGIN#%s#%s",user,password);
+    requete[strlen(requete)]='\0';
+    // Echange entre le serveur et client
+    Echange(requete,reponse);
+
+    char *ptr = strtok(reponse,"#");
+    ptr = strtok(NULL,"#");
+    if(strcmp(ptr,"ok") == 0) printf("Login OK. \n");
+    else
+    {
+        ptr = strtok(NULL,"#");
+        printf("Erreur de login: %s\n",ptr);
+        onContinue=false;
+    }
+
+    return onContinue;
+}
+
+void OBEP_Logout()
+{
+    char requete[200],reponse[200];
+    int nbEcrits, nbLus;
+
+    // ***** Construction de la requete *********************
+    sprintf(requete,"LOGOUT");
+    // ***** Envoi requete + réception réponse **************
+    Echange(requete,reponse);
+}
+
+
+void OBEP_Operation(char op)
+{
+
+}
+
+// Définition de échange //
+void Echange(char* requete,char* reponse)
+{
+    int nbEcrits=0, nbLus=0;
+    // ***** Envoi de la requete ****************************
+    if ((nbEcrits = Send(sClient,requete,strlen(requete))) == -1)
+    {
+        perror("Erreur de Send");
+        close(sClient);
+        exit(1);
+    }
+    // ***** Attente de la reponse **************************
+    if ((nbLus = Receive(sClient,reponse)) < 0)
+    {
+        perror("Erreur de Receive");
+        close(sClient);
+        exit(1);
+    }
+    if (nbLus == 0)
+    {
+        printf("Serveur arrete, pas de reponse reçue...\n");
+        close(sClient);
+        exit(1);
+    }
+    reponse[nbLus] = 0;
+}
+

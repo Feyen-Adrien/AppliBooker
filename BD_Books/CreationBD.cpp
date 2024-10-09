@@ -28,6 +28,39 @@ typedef struct {
   int   publish_year;
 } BOOK;
 
+typedef struct {
+  int id;
+  char[50] login;
+  char[50] password;
+} EMPLOYEES;
+
+typedef struct {
+  int id;
+  char name[20];
+  char firstname[20];
+  int clientNr;
+  char adresse[100];
+  char email[100];
+  char telNumber[20];
+  // on peut encore rajouter mais bon pas besoin de plus je pense
+} CLIENTS;
+
+typedef struct {
+  int id;
+  int clientId;
+  char date[20];
+  float amount;
+  float payed;
+} CADDIES;
+
+typedef struct {
+  int id;
+  int caddyId;
+  int bookId; // clé étrangère
+  int quantity; // clé étrangère
+} CADDY_ITEMS;
+
+
 AUTHOR authors[] = {
   {-1,"Werber","Bernard","1961-09-18"},  // id = 1
   {-1,"Brown","Dan","1964-06-22"},       // id = 2
@@ -88,6 +121,26 @@ int main(int argc,char *argv[])
     finish_with_error(connexion);
   }
 
+  // Supprimer la table employees si elle existe déjà
+  if (mysql_query(connexion, "DROP TABLE IF EXISTS employees;")) {
+    finish_with_error(connexion);
+  }
+
+  // Supprimer la table clients si elle existe déjà
+  if (mysql_query(connexion, "DROP TABLE IF EXISTS clients;")) {
+    finish_with_error(connexion);
+  }
+
+  // Supprimer la table caddies si elle existe déjà
+  if (mysql_query(connexion, "DROP TABLE IF EXISTS caddies;")) {
+    finish_with_error(connexion);
+  }
+
+  // Supprimer la table caddy_items si elle existe déjà
+  if (mysql_query(connexion, "DROP TABLE IF EXISTS caddy_items;")) {
+    finish_with_error(connexion);
+  }
+
   // Creation de la table authors
   printf("Creation de la table authors...\n");
   if (mysql_query(connexion,"CREATE TABLE authors ("
@@ -120,6 +173,52 @@ int main(int argc,char *argv[])
                        "publish_year INT, "
                        "FOREIGN KEY (author_id) REFERENCES authors(id), "
                        "FOREIGN KEY (subject_id) REFERENCES subjects(id));")) {
+    finish_with_error(connexion);
+  }
+
+  // Créer la table employees
+  printf("Creation de la table employees...\n");
+  if (mysql_query(connexion, "CREATE TABLE employees ("
+                       "id INT(4) AUTO_INCREMENT PRIMARY KEY, "
+                       "login VARCHAR(50), "
+                       "password VARCHAR(50);")){
+    finish_with_error(connexion);
+  }
+
+  // Créer la table clients
+  printf("Creation de la table clients...\n");
+  if (mysql_query(connexion, "CREATE TABLE clients ("
+                       "id INT(4) AUTO_INCREMENT PRIMARY KEY, "
+                       "name VARCHAR(20), "
+                       "firstname VARCHAR(20), "
+                       "clientNr INT, "
+                       "adresse VARCHAR(100), "
+                       "email VARCHAR(100), "
+                       "telNumber VARCHAR(20);")){
+    finish_with_error(connexion);
+  }
+
+    // Créer la table caddies
+  printf("Creation de la table caddies...\n");
+  if (mysql_query(connexion, "CREATE TABLE caddies ("
+                       "id INT(4) AUTO_INCREMENT PRIMARY KEY, "
+                       "clientId INT, "
+                       "date VARCHAR(), "
+                       "amount INT, "
+                       "payed INT, "
+                       "FOREIGN KEY (clientId) REFERENCES clients(id));")) {
+    finish_with_error(connexion);
+  }
+
+    // Créer la table caddy_items
+  printf("Creation de la table caddy_items...\n");
+  if (mysql_query(connexion, "CREATE TABLE caddy_items ("
+                       "id INT(4) AUTO_INCREMENT PRIMARY KEY, "
+                       "caddyId INT, "
+                       "bookId INT, "
+                       "quantity INT, "
+                       "FOREIGN KEY (caddyId) REFERENCES caddies(id), "
+                       "FOREIGN KEY (bookId) REFERENCES books(id));")) {
     finish_with_error(connexion);
   }
 

@@ -1,8 +1,7 @@
 file(REMOVE_RECURSE
   "ApplicBooker"
   "ApplicBooker.pdb"
-  "CMakeFiles/ApplicBooker.dir/src/Client.cpp.o"
-  "CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.o"
+  "CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o"
   "CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o"
   "CMakeFiles/ApplicBooker.dir/src/main.cpp.o"
   "CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o"

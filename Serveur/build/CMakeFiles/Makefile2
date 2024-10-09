@@ -63,16 +63,16 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt
+CMAKE_SOURCE_DIR = /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/Serveur
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build
+CMAKE_BINARY_DIR = /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/Serveur/build
 
 #=============================================================================
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/ApplicBooker.dir/all
+all: CMakeFiles/Serveur.dir/all
 
 .PHONY : all
 
@@ -82,36 +82,36 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/ApplicBooker.dir/clean
+clean: CMakeFiles/Serveur.dir/clean
 
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/ApplicBooker.dir
+# Target rules for target CMakeFiles/Serveur.dir
 
 # All Build rule for target.
-CMakeFiles/ApplicBooker.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target ApplicBooker"
-.PHONY : CMakeFiles/ApplicBooker.dir/all
+CMakeFiles/Serveur.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Serveur.dir/build.make CMakeFiles/Serveur.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Serveur.dir/build.make CMakeFiles/Serveur.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/Serveur/build/CMakeFiles --progress-num=1,2,3,4 "Built target Serveur"
+.PHONY : CMakeFiles/Serveur.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/ApplicBooker.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles 6
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ApplicBooker.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/build/CMakeFiles 0
-.PHONY : CMakeFiles/ApplicBooker.dir/rule
+CMakeFiles/Serveur.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/Serveur/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Serveur.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/Serveur/build/CMakeFiles 0
+.PHONY : CMakeFiles/Serveur.dir/rule
 
 # Convenience name for target.
-ApplicBooker: CMakeFiles/ApplicBooker.dir/rule
+Serveur: CMakeFiles/Serveur.dir/rule
 
-.PHONY : ApplicBooker
+.PHONY : Serveur
 
 # clean rule for target.
-CMakeFiles/ApplicBooker.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/clean
-.PHONY : CMakeFiles/ApplicBooker.dir/clean
+CMakeFiles/Serveur.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Serveur.dir/build.make CMakeFiles/Serveur.dir/clean
+.PHONY : CMakeFiles/Serveur.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

@@ -142,59 +142,32 @@ ApplicBooker/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/build
 .PHONY : ApplicBooker/fast
 
-src/Client.o: src/Client.cpp.o
+src/OBEP.o: src/OBEP.cpp.o
 
-.PHONY : src/Client.o
-
-# target to build an object file
-src/Client.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Client.cpp.o
-.PHONY : src/Client.cpp.o
-
-src/Client.i: src/Client.cpp.i
-
-.PHONY : src/Client.i
-
-# target to preprocess a source file
-src/Client.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Client.cpp.i
-.PHONY : src/Client.cpp.i
-
-src/Client.s: src/Client.cpp.s
-
-.PHONY : src/Client.s
-
-# target to generate assembly for a file
-src/Client.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Client.cpp.s
-.PHONY : src/Client.cpp.s
-
-src/Serveur.o: src/Serveur.cpp.o
-
-.PHONY : src/Serveur.o
+.PHONY : src/OBEP.o
 
 # target to build an object file
-src/Serveur.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.o
-.PHONY : src/Serveur.cpp.o
+src/OBEP.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o
+.PHONY : src/OBEP.cpp.o
 
-src/Serveur.i: src/Serveur.cpp.i
+src/OBEP.i: src/OBEP.cpp.i
 
-.PHONY : src/Serveur.i
+.PHONY : src/OBEP.i
 
 # target to preprocess a source file
-src/Serveur.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.i
-.PHONY : src/Serveur.cpp.i
+src/OBEP.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.i
+.PHONY : src/OBEP.cpp.i
 
-src/Serveur.s: src/Serveur.cpp.s
+src/OBEP.s: src/OBEP.cpp.s
 
-.PHONY : src/Serveur.s
+.PHONY : src/OBEP.s
 
 # target to generate assembly for a file
-src/Serveur.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/Serveur.cpp.s
-.PHONY : src/Serveur.cpp.s
+src/OBEP.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ApplicBooker.dir/build.make CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.s
+.PHONY : src/OBEP.cpp.s
 
 src/TCP.o: src/TCP.cpp.o
 
@@ -313,12 +286,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... ApplicBooker"
-	@echo "... src/Client.o"
-	@echo "... src/Client.i"
-	@echo "... src/Client.s"
-	@echo "... src/Serveur.o"
-	@echo "... src/Serveur.i"
-	@echo "... src/Serveur.s"
+	@echo "... src/OBEP.o"
+	@echo "... src/OBEP.i"
+	@echo "... src/OBEP.s"
 	@echo "... src/TCP.o"
 	@echo "... src/TCP.i"
 	@echo "... src/TCP.s"
