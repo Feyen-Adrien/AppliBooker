@@ -119,7 +119,6 @@ void* FctThreadClient(void* p)
 		// Traitement de la connexion (consommation de la tâche)
 		printf("\t[THREAD %p] Je m'occupe de la socket %d\n",pthread_self(),sService);
 		TraitementConnexion(sService);
-		printf("ça passe\n");
  	}
 }
 
@@ -151,16 +150,15 @@ void TraitementConnexion(int sService)
 			close(sService);
 			HandlerSIGINT(0);
 		}
-
 		// ***** Fin de connexion ? *****************
-		/*if (nbLus == 0)
+		if (nbLus == 0)
 		{
 			printf("\t[THREAD %p] Fin de connexion du client.\n",pthread_self());
 			close(sService);
 			return;
-		}*/
+		}
 
-		requete[nbLus] = '\0';
+		requete[nbLus] = 0;
 		printf("\t[THREAD %p] Requete recue = %s\n",pthread_self(),requete);
 		
 		// ***** Traitement de la requete ***********
@@ -173,9 +171,6 @@ void TraitementConnexion(int sService)
 			HandlerSIGINT(0);
 		}
 		printf("\t[THREAD %p] Reponse envoyee = %s\n",pthread_self(),reponse);
-
-		if (!onContinue)
- 			printf("\t[THREAD %p] Fin de connexion de la socket %d\n",pthread_self(),sService);
 
 	}
 

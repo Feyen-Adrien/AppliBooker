@@ -25,7 +25,6 @@ bool OBEP(char* requete, char* reponse,int socket)
 		if(estPresent(socket) >= 0)
 		{
 			sprintf(reponse,"LOGIN#ko#Client déjà loggé !");
-			return false;
 		}
 		else
 		{
@@ -37,20 +36,18 @@ bool OBEP(char* requete, char* reponse,int socket)
 			else
 			{
 				sprintf(reponse,"LOGIN#ko#Mauvais identifiants !");
-				return false;
 			}
 		}
 	}
 
 	// CAS DE LOGOUT
-	if(strcmp(reponse,"LOGOUT") == 0)
+	if(strcmp(ptr,"LOGOUT") == 0)
 	{
 		printf("%\t[THREAD %p] LOGOUT\n",pthread_self());
-		retire(socket);
 		sprintf(reponse,"LOGOUT#ok");
-		return false;
+		retire(socket);
 	}
-	return  true;
+	return true;
 }
 bool OBEP_Login(const char* user,const char* password)
 {

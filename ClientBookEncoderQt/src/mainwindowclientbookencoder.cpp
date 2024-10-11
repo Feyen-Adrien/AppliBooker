@@ -272,14 +272,38 @@ void MainWindowClientBookEncoder::on_pushButtonClear_clicked() {
 }
 
 void MainWindowClientBookEncoder::on_actionLogin_triggered() {
-    string login = this->dialogInputText("Entrée en session","Login ?");
-    string password = this->dialogInputText("Entrée en session","Password ?");
-    //envoyer au serveur la commande
-    if(!OBEP_Login_Client(login.c_str(),password.c_str()))
+    
+    // vérification qu'un LOGIN est bien encodé
+    string login = this->dialogInputText("Entrée en session","Login ?"); //le caractère ' ' fait bugger
+    if(strlen(login.c_str()) == 0)
     {
-        this->dialogError("LOGIN","Mauvais identifiants !");
+        this->dialogError("LOGIN","Veuillez entrer un identifiant !");
     }
-    this->loginOk();
+    else
+    {
+        // vérification qu'un mdp est bien encodé
+        string password = this->dialogInputText("Entrée en session","Password ?");
+
+        if(strlen(password.c_str()) == 0)
+        {
+            this->dialogError("LOGIN","Veuillez entrer un mot de passe !");
+        }
+        else
+        {
+            //envoyer au serveur la commande + vérif
+            if(OBEP_Login_Client(login.c_str(),password.c_str())==false)
+            {
+                this->dialogError("LOGIN","Mauvais identifiants !");
+            }
+            else
+            {
+                this->loginOk();
+            }
+
+        }
+
+    }
+    
 }
 
 void MainWindowClientBookEncoder::on_actionLogout_triggered() {
@@ -306,7 +330,7 @@ bool OBEP_Login_Client(const char* user,const char* password)
 
     // Construction de la requête 
     sprintf(requete,"LOGIN#%s#%s",user,password);
-    requete[strlen(requete)]='\0';
+
     // Echange entre le serveur et client
     Echange(requete,reponse);
 
@@ -326,10 +350,9 @@ bool OBEP_Login_Client(const char* user,const char* password)
 void OBEP_Logout()
 {
     char requete[200],reponse[200];
-    int nbEcrits, nbLus;
 
     // ***** Construction de la requete *********************
-    sprintf(requete,"LOGOUT");
+    sprintf(requete,"LOGOUT#");
     // ***** Envoi requete + réception réponse **************
     Echange(requete,reponse);
 }
@@ -344,6 +367,8 @@ void OBEP_Operation(char op)
 void Echange(char* requete,char* reponse)
 {
     int nbEcrits=0, nbLus=0;
+    
+
     // ***** Envoi de la requete ****************************
     if ((nbEcrits = Send(sClient,requete,strlen(requete))) == -1)
     {

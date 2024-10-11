@@ -6,6 +6,22 @@
 
 #IncludeRegexTransform: 
 
+../include/OBEP.h
+stdio.h
+-
+unistd.h
+-
+stdlib.h
+-
+unistd.h
+-
+pthread.h
+-
+string.h
+-
+TCP.h
+../include/TCP.h
+
 ../include/TCP.h
 stdio.h
 -
@@ -26,7 +42,7 @@ cstring
 netdb.h
 -
 
-/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/TCP.cpp
-TCP.h
-/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/TCP.h
+/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/OBEP.cpp
+OBEP.h
+/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/OBEP.h
 

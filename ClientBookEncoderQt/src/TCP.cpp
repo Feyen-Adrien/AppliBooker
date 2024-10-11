@@ -1,5 +1,6 @@
 #include "TCP.h"
 
+
 int ServerSocket(int bearing)
 {
 	// création de la socket
@@ -73,18 +74,22 @@ int ClientSocket(char* ipServeur, int portServeur)
 	hints.ai_family=AF_INET; // => protocole fondé sur IPv4
 	hints.ai_socktype=SOCK_STREAM; //=> car mode connecté (TCP)
 	hints.ai_flags = AI_NUMERICSERV;
-	if(getaddrinfo(ipServeur,to_string(portServeur).c_str(),&hints,&results) != 0) // mettre NULL car on crée un SERVEUR ICI ip => 0.0.0.0 et le port souahité
+	if(getaddrinfo(ipServeur,to_string(portServeur).c_str(),&hints,&results) != 0) 
 	{
 		printf("erreur getaddrinfo");
-		exit(1);
+		//exit(1);
 	}
-	
 	// Demande de connexion
  	if (connect(s,results->ai_addr,results->ai_addrlen) == -1)
  	{
- 		perror("Erreur de connect()");
+ 		printf("Erreur de connect()");
+ 		return-1;
  	}
- 	printf("connect() reussi !\n");
+ 	else
+ 	{
+ 		printf("connect() reussi !\n");
+ 	}
+ 	
 	return s;
 }
 
@@ -126,28 +131,45 @@ int Accept(int sEcoute, char* ipClient)
 int Send(int sSocket,char* data,int taille)
 {
 	int nb=0;
-	if(nb = write(sSocket,&data,taille) == -1)
+	// premier écriture pour savoir la taille de la requête.
+	if((nb = write(sSocket,&taille,sizeof(taille)))==-1)
+	{
+		perror("Erreur de write pour la taille");
+		close(sSocket);
+	}
+	printf("(Taille) nbEcrit = %d Ecrit : --%d--\n",nb,taille);
+
+	// deuxième écriture qui envoit la requête
+	if((nb = write(sSocket,data,taille)) == -1)
 	{
 		perror("Erreur de write()");
 		close(sSocket);
 	}
 	else
 	{
-		printf("nbEcrit = %d Ecrit : ---%s---\n",nb,data,sSocket);
-
+		printf("nbEcrit = %d Ecrit : ---%s---\n",nb,data);
 	}
 	
 	return nb;
 }
 int Receive(int sSocket,char* data)
 {
-	int nb=0;
-	if((nb = read(sSocket,&data,strlen(data)))== -1)
+	int nb =0;
+	int taille=0;
+
+	// première lecture pour savoir la taille de la requête
+	if((nb=read(sSocket,&taille,sizeof(taille)))==-1)
+	{
+		perror("Erreur de read pour la taille");
+		close(sSocket);
+	}
+	printf("(Taille) nbLu = %d Lu : --%d--\n",nb,taille);
+
+	if((nb=read(sSocket,data,taille))==-1)
 	{
 		perror("Erreur de read()");
 		close(sSocket);
 	}
-
 	printf("nbLu = %d Lu : ---%s---\n",nb,data);
 
 	return nb;
