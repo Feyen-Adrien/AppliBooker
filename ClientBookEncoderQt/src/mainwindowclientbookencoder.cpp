@@ -12,13 +12,11 @@ int sClient;
 char IpServeur[50] = "0.0.0.0";
 
 bool OBEP_Login_Client(const char* user, const char* password);
-void OBEP_GET_AUTHORS_Client();
-void OBEP_GET_SUBJECTS_Client();
-void OBEP_ADD_AUTHOR_Client();
+bool OBEP_ADD_AUTHOR_Client(const char* nom, const char* prenom, const char* date);
 void OBEP_ADD_SUBJECT_Client();
 void OBEP_ADD_BOOK_Client();
 void OBEP_Logout();
-bool OBEP_Operation(int op);
+bool isValidDate(const char* date);
 void Echange(char* requete,char* reponse);
 
 
@@ -244,11 +242,40 @@ int MainWindowClientBookEncoder::dialogInputInt(const string& title,const string
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindowClientBookEncoder::on_pushButtonAddAuthor_clicked() {
     string lastName = this->dialogInputText("Nouvel auteur","Nom ?");
-    string firstName = this->dialogInputText("Nouvel auteur","Prénom ?");
-    string birthDate = this->dialogInputText("Nouvel auteur","Date de naissance (yyyy-mm-dd) ?");
-    cout << "Nom : " << lastName << endl;
-    cout << "Prénom : " << firstName << endl;
-    cout << "Date de naissance : " << birthDate << endl;
+    if(strlen(lastName.c_str())==0)
+    {
+        this->dialogError("Nouvel auteur","Veuillez entrer un nom pour l'auteur !");
+    }
+    else
+    {
+        string firstName = this->dialogInputText("Nouvel auteur","Prénom ?");   
+        if(strlen(firstName.c_str())==0)
+        {
+            this->dialogError("Nouvel auteur","Veuillez entrer un prénom pour l'auteur !");
+        }
+        else
+        {
+            string birthDate = this->dialogInputText("Nouvel auteur","Date de naissance (yyyy-mm-dd) ?");
+            if(!isValidDate(birthDate.c_str()))
+            {
+                this->dialogError("Nouvel auteur","Veuillez entrer une date valide !");
+            }
+            else
+            {
+                if(!OBEP_ADD_AUTHOR_Client(lastName.c_str(),firstName.c_str(),birthDate.c_str()))
+                {
+                    this->dialogError("Nouvel auteur","Erreur lors de l'insertion !");
+                }
+                else
+                {
+                    if(!OBEP_Operation(1)) // MAJ AJOUT
+                    {
+                        this->dialogError("Nouvel auteur","Erreur lecture des auteurs !");   
+                    }
+                }
+            }
+        }
+    }
 }
 
 void MainWindowClientBookEncoder::on_pushButtonAddSubject_clicked() {
@@ -312,6 +339,10 @@ void MainWindowClientBookEncoder::on_actionLogin_triggered() {
                 {
                     this->dialogError("LOGIN","Erreur lecture des sujets !");
                 }
+                /*if(!OBEP_Operation(3)) pas appeler car il doit seulement voir les livres qu'il encode lui
+                {
+                    this->dialogError("LOGIN","Erreur lecture des livres !");
+                }*/ 
             }
 
         }
@@ -367,7 +398,7 @@ bool OBEP_Login_Client(const char* user,const char* password)
 void MainWindowClientBookEncoder::OBEP_GET_AUTHORS_Client()
 {
     char SQL[200]="";
-    char nom[50];
+    char nom[50] = "";
     int nbLus;
 
     clearComboBoxAuthors();
@@ -398,7 +429,11 @@ void MainWindowClientBookEncoder::OBEP_GET_AUTHORS_Client()
             i++;
             ptr=strtok(NULL,"#");
         }
-        addComboBoxAuthors(nom); // ajout du nom
+        if(!strcmp(SQL,"FINRSQL")==0)
+        {
+            addComboBoxAuthors(nom); // ajout du nom
+        }
+        
     }
 }
 
@@ -409,7 +444,6 @@ void MainWindowClientBookEncoder::OBEP_GET_SUBJECTS_Client()
     int nbLus;
 
     clearComboBoxSubjects();
-
     while(strcmp(SQL,"FINRSQL")!=0)
     {
         memset(SQL,0,sizeof(SQL));// remet à zéro SQL // IMPORTANT CAR LA TAILLE EST MAL LUE SINON
@@ -432,18 +466,111 @@ void MainWindowClientBookEncoder::OBEP_GET_SUBJECTS_Client()
             i++;
             ptr=strtok(NULL,"#");
         }
+        if(!strcmp(SQL,"FINRSQL")==0)
+        {
+            addComboBoxSubjects(nom); // ajout du sujet
+        }
     }
-        addComboBoxSubjects(nom); // ajout du sujet
 }
-void MainWindowClientBookEncoder::OBEP_ADD_AUTHOR_Client()
+void MainWindowClientBookEncoder::OBEP_GET_BOOKS_Client()
+{
+    char SQL[200]="";
+    char nom[50];
+    int nbLus;
+    int id, pageCount, publishYear, stockQuantity;
+    string title, author, subject, isbn;
+    float price;
+
+    clearTableBooks();
+    while(strcmp(SQL,"FINRSQL")!=0)
+    {
+        memset(SQL,0,sizeof(SQL));// remet à zéro SQL // IMPORTANT CAR LA TAILLE EST MAL LUE SINON
+        printf("%s\n",SQL);
+        if ((nbLus = Receive(sClient,SQL)) < 0)
+        {
+            perror("Erreur de Receive");
+            ::close(sClient); // il faut les :: pour eviter l'ambiguité entre close de Qt et le close qui ferme la socket !
+            exit(1);
+        }
+
+        printf("%s\n",SQL);
+        char *ptr = strtok(SQL,"#");
+        int i = 0;
+        while(ptr !=NULL)
+        {
+            if(i==0)
+            {
+                id = atoi(ptr);
+            }
+            if(i==1)
+            {
+                title = ptr;
+            }
+            if(i==2)
+            {
+                author = ptr;
+            }
+            if(i==3)
+            {
+                subject = ptr;
+            }
+            if(i==4)
+            {
+                isbn = ptr;
+            }
+            if(i==5)
+            {
+                pageCount = atoi(ptr);
+            }
+            if(i==6)
+            {
+                publishYear = atoi(ptr);
+            }
+            if(i==7)
+            {
+                price = atof(ptr);
+            }
+            if(i==8)
+            {
+                stockQuantity = atoi(ptr);
+            }
+            i++;
+            ptr=strtok(NULL,"#");
+        }
+        if(!strcmp(SQL,"FINRSQL")==0)
+        {
+            addTupleTableBooks(id, title, author, subject, isbn, pageCount, publishYear, price, stockQuantity); // ajout des livres
+        }
+    }   
+}
+bool OBEP_ADD_AUTHOR_Client(const char* nom, const char* prenom, const char* date)
+{
+    char requete[200],reponse[200];
+    bool onContinue = true;
+
+    // Construction de la requête 
+    sprintf(requete,"ADD_AUTHOR#%s#%s#%s",nom,prenom,date);
+
+    // Echange entre le serveur et client
+    Echange(requete,reponse);
+
+    char *ptr = strtok(reponse,"#");
+    ptr = strtok(NULL,"#");
+    if(strcmp(ptr,"ok") == 0) printf("ADD_AUTHOR OK. \n");
+    else
+    {
+        ptr = strtok(NULL,"#");
+        printf("Erreur de ADD_AUTHOR: %s\n",ptr);
+        onContinue=false;
+    }
+
+    return onContinue;
+}
+void OBEP_ADD_SUBJECT_Client()
 {
 
 }
-void MainWindowClientBookEncoder::OBEP_ADD_SUBJECT_Client()
-{
-
-}
-void MainWindowClientBookEncoder::OBEP_ADD_BOOK_Client()
+void OBEP_ADD_BOOK_Client()
 {
 
 }
@@ -479,17 +606,61 @@ bool MainWindowClientBookEncoder::OBEP_Operation(int op)
             Echange(requete,reponse);
             if(strcmp(reponse,"GET_SUBJECTS#ok")==0)
             {
-                OBEP_ADD_SUBJECT_Client();
+                OBEP_GET_SUBJECTS_Client();
                 return true;
             }
             return false;
-
-
+        case 3:
+            sprintf(requete,"GET_BOOKS#");
+            Echange(requete,reponse);
+            if(strcmp(reponse,"GET_BOOKS#ok")==0);
+            {
+                OBEP_GET_BOOKS_Client();
+                return true;
+            }
+            return false;
 
         default: printf("Erreur lors du switch !");
         return false;
     }
 }
+// verifie la date encodé au bon format
+bool isValidDate(const char* date) {
+    // Vérifie la longueur
+    if (strlen(date) != 10) return false;
+
+    // Vérifie le format yyyy-mm-dd
+    if (date[4] != '-' || date[7] != '-') return false;
+
+    // Vérifie que les années, mois et jours sont des chiffres
+    for (int i = 0; i < 10; i++) {
+        if (i == 4 || i == 7) continue; // Ignore les tirets
+        if (!isdigit(date[i])) return false; // Vérifie que c'est un chiffre
+    }
+
+    // Extraire les composants
+    int year = atoi(date);
+    int month = atoi(date + 5);
+    int day = atoi(date + 8);
+
+    // Vérifie les mois et jours valides
+    if (month < 1 || month > 12) return false;
+    if (day < 1 || day > 31) return false;
+
+    // Vérifie les jours en fonction des mois
+    if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) return false;
+    if (month == 2) {
+        // Vérification pour les années bissextiles
+        if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+            if (day > 29) return false; // Février bissextile
+        } else {
+            if (day > 28) return false; // Février non bissextile
+        }
+    }
+
+    return true; // Format valide
+}
+
 
 // Définition de échange //
 void Echange(char* requete,char* reponse)

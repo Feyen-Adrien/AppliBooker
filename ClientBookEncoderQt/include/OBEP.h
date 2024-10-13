@@ -8,6 +8,8 @@
 #include <pthread.h>
 #include <string.h>
 #include <mysql.h>
+#include <time.h>
+#include <ctype.h>
 #include "TCP.h"
 
 
@@ -18,7 +20,8 @@ bool OBEP(char* requete, char* reponse,int socket,MYSQL* c);
 bool OBEP_Login(const char* user,const char* password);
 bool OBEP_GET_AUTHORS(char* reponse,MYSQL* c);
 bool OBEP_GET_SUBJECTS(char* reponse,MYSQL* c);
-bool OBEP_ADD_AUTHOR(MYSQL* c);
+bool OBEP_GET_BOOKS(char* reponse,MYSQL* c);
+bool OBEP_ADD_AUTHOR(const char* nom, const char* prenom, const char* date,MYSQL* c);
 bool OBEP_ADD_SUBJECT(MYSQL* c);
 bool OBEP_ADD_BOOK(MYSQL* c);
 void OBEP_Close();

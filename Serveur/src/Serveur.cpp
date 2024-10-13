@@ -140,7 +140,7 @@ void TraitementConnexion(int sService)
 {
 	char requete[200], reponse[200], Ressql[200], sql[100];
  	int nbLus, nbEcrits;
-	bool onContinue = true,requetSQL = false;
+	bool onContinue = true;
 
 
 	while(onContinue)

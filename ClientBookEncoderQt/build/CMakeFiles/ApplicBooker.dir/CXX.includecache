@@ -21,6 +21,10 @@ string.h
 -
 mysql.h
 -
+time.h
+-
+ctype.h
+-
 TCP.h
 ../include/TCP.h
 
