@@ -11,17 +11,17 @@ void retire(int socket);
 pthread_mutex_t mutexClients = PTHREAD_MUTEX_INITIALIZER; // initialiser un mutex mais de manière statique pas dynamique(=> pthread_mutext_init())
 
 
-bool OBEP(char* requete, char* reponse,int socket)
+bool OBEP(char* requete, char* reponse,int socket,MYSQL* c)
 {
 	char *ptr = strtok(requete,"#");
 
-	// en cas de LOGIN
+	// CAS LOGIN
 	if(strcmp(ptr,"LOGIN")== 0)
 	{
 		char user[50],password[50];
 		strcpy(user,strtok(NULL,"#"));
 		strcpy(password,strtok(NULL,"#"));
-		printf("%\t[THREAD %p] LOGIN de %s\n",pthread_self(),user);
+		printf("\t[THREAD %p] LOGIN de %s\n",pthread_self(),user);
 		if(estPresent(socket) >= 0)
 		{
 			sprintf(reponse,"LOGIN#ko#Client déjà loggé !");
@@ -39,26 +39,47 @@ bool OBEP(char* requete, char* reponse,int socket)
 			}
 		}
 	}
-
-	// CAS DE LOGOUT
-	if(strcmp(ptr,"LOGOUT") == 0)
+	else
 	{
-		printf("%\t[THREAD %p] LOGOUT\n",pthread_self());
-		sprintf(reponse,"LOGOUT#ok");
-		retire(socket);
+		// CAS	LOGOUT
+		if(strcmp(ptr,"LOGOUT") == 0)
+		{
+			printf("%\t[THREAD %p] LOGOUT\n",pthread_self());
+			sprintf(reponse,"LOGOUT#ok");
+			retire(socket);
+		}
+		else
+		{
+			// CAS GET_AUTHORS
+			if(strcmp(ptr,"GET_AUTHORS")==0)
+			{
+				return OBEP_GET_AUTHORS(reponse,c);
+
+			}
+			else
+			{
+				if (strcmp(ptr,"GET_SUBJECTS")==0)
+				{
+					return OBEP_GET_SUBJECTS(reponse,c);
+				}
+			}
+
+		}
 	}
+
+	
+
 	return true;
 }
 bool OBEP_Login(const char* user,const char* password)
 {
 	if(strcmp(user,"adri")==0 && strcmp(password,"123")==0) return true;
-	// requete sql ici normalement pour accèes bd
+	if(strcmp(user,"gaut")==0 && strcmp(password,"456")==0) return true;
+
 	return false;
 }
-int OBEP_Operation(char op,int a,int b)
-{
-	// acces bd requete sql
-}
+
+
 // EN CAS DE FIN PRÉMATURÉ 
 void OBEP_Close()
 {
@@ -68,6 +89,36 @@ void OBEP_Close()
 	}
 	pthread_mutex_unlock(&mutexClients);
 }
+
+bool OBEP_GET_AUTHORS(char* reponse,MYSQL* c)
+{
+	char r[] = "SELECT * FROM authors";
+	if(mysql_query(c,r) != 0)
+	{
+		printf("Erreur de mysql_query : %s\n",mysql_error(c));
+		exit(1);
+	}
+	printf("Requête SELECT réussie.\n");
+	sprintf(reponse,"GET_AUTHORS#ok");
+	return false;
+}
+bool OBEP_GET_SUBJECTS(char* reponse,MYSQL* c)
+{
+	char r[] = "SELECT * FROM subjects";
+	if(mysql_query(c,r) != 0)
+	{
+		printf("Erreur de mysql_query : %s\n",mysql_error(c));
+		exit(1);
+	}
+	printf("Requête SELECT réussie.\n");
+	sprintf(reponse,"GET_SUBJECTS#ok");
+	return false;
+}
+bool OBEP_ADD_AUTHOR();
+bool OBEP_ADD_SUBJECT();
+bool OBEP_ADD_BOOK();
+
+
 
 // permet de vérifier la connexion d'un client
 int estPresent(int socket)

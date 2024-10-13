@@ -21,6 +21,7 @@ int sEcoute;
 
 int socketsAcceptees[TAILLE_FILE_ATTENTE]; // tableaux pour savoir cmb de socket on été acceptée
 int indiceEcriture=0, indiceLecture=0;
+MYSQL* connexion;
 
 pthread_mutex_t mutexSocketsAcceptees; 
 pthread_cond_t condSocketsAcceptees;
@@ -130,15 +131,17 @@ void HandlerSIGINT(int s)
 	for (int i=0 ; i<TAILLE_FILE_ATTENTE ; i++)
 	if (socketsAcceptees[i] != -1) close(socketsAcceptees[i]);
 	pthread_mutex_unlock(&mutexSocketsAcceptees);
+	mysql_close(connexion);
 	OBEP_Close();
 	exit(0);
 }
 
 void TraitementConnexion(int sService)
 {
-	char requete[200], reponse[200];
+	char requete[200], reponse[200], Ressql[200], sql[100];
  	int nbLus, nbEcrits;
-	bool onContinue = true;
+	bool onContinue = true,requetSQL = false;
+
 
 	while(onContinue)
 	{
@@ -161,16 +164,82 @@ void TraitementConnexion(int sService)
 		requete[nbLus] = 0;
 		printf("\t[THREAD %p] Requete recue = %s\n",pthread_self(),requete);
 		
-		// ***** Traitement de la requete ***********
-		onContinue = OBEP(requete,reponse,sService);
-		// ***** Envoi de la reponse ****************
-		if ((nbEcrits = Send(sService,reponse,strlen(reponse))) < 0)
+		// Connexion à la base de données
+		connexion = mysql_init(NULL);
+
+		if(mysql_real_connect(connexion,"localhost","Student","PassStudent1_","PourStudent",0,0,0)==NULL)
 		{
-			perror("Erreur de Send");
-			close(sService);
-			HandlerSIGINT(0);
+			printf("Erreur de connexion à la base de données: %s\n",mysql_error(connexion));
+			exit(1);
 		}
-		printf("\t[THREAD %p] Reponse envoyee = %s\n",pthread_self(),reponse);
+		printf("Connexion à la BD réussi !\n");
+		// ***** Traitement de la requete ***********
+		onContinue = OBEP(requete,reponse,sService,connexion); // renvoie false pour dire qu'il faut envoyer la requete sql reçue
+		if(!onContinue)
+		{
+			// ***** Envoi de la reponse ****************
+			if ((nbEcrits = Send(sService,reponse,strlen(reponse))) < 0)
+			{
+				perror("Erreur de Send");
+				close(sService);
+				HandlerSIGINT(0);
+			}
+			
+
+			printf("\t[THREAD %p] Reponse envoyee = %s\n",pthread_self(),reponse);
+			MYSQL_RES * ResultSet;
+			if((ResultSet = mysql_store_result(connexion))==NULL)
+			{
+				printf("Erreur de mysql_store_result : %s\n",mysql_error(connexion));
+				HandlerSIGINT(0);
+			}
+			MYSQL_ROW ligne;
+			int champs = mysql_num_fields(ResultSet);
+			while((ligne = mysql_fetch_row(ResultSet)) != NULL)
+			{
+				for(int i=0;i<champs;i++)
+				{
+					printf("%10s\t",ligne[i]);
+					sprintf(sql,"%s",ligne[i]);
+					strcat(Ressql,sql);
+					if(i != champs-1)
+					{
+						strcat(Ressql,"#");
+					}
+				}
+				printf("%s",Ressql);
+				if ((nbEcrits = Send(sService,Ressql,strlen(Ressql))) < 0)
+				{
+					perror("Erreur de Send");
+					close(sService);
+					HandlerSIGINT(0);
+				}
+				memset(Ressql,0,sizeof(Ressql));
+				printf("\n");
+			}
+			strcpy(Ressql,"FINRSQL");
+			if ((nbEcrits = Send(sService,Ressql,strlen(Ressql))) < 0)
+			{
+				perror("Erreur de Send");
+				close(sService);
+				HandlerSIGINT(0);
+			}
+			mysql_close(connexion);
+			memset(Ressql,0,sizeof(Ressql)); // remet à zero
+			onContinue=true;
+
+		}
+		else
+		{
+			// ***** Envoi de la reponse ****************
+			if ((nbEcrits = Send(sService,reponse,strlen(reponse))) < 0)
+			{
+				perror("Erreur de Send");
+				close(sService);
+				HandlerSIGINT(0);
+			}
+
+		}
 
 	}
 

@@ -5,6 +5,18 @@ CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o
  ../include/OBEP.h
  ../include/TCP.h
  /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/OBEP.cpp
+ /usr/include/mysql/errmsg.h
+ /usr/include/mysql/field_types.h
+ /usr/include/mysql/my_command.h
+ /usr/include/mysql/my_compress.h
+ /usr/include/mysql/my_list.h
+ /usr/include/mysql/mysql.h
+ /usr/include/mysql/mysql/client_plugin.h
+ /usr/include/mysql/mysql/plugin_auth_common.h
+ /usr/include/mysql/mysql/udf_registration_types.h
+ /usr/include/mysql/mysql_com.h
+ /usr/include/mysql/mysql_time.h
+ /usr/include/mysql/mysql_version.h
 CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o
  ../include/TCP.h
  /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/TCP.cpp
@@ -132,6 +144,18 @@ CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o
  ../include/mainwindowclientbookencoder.h
  ../include/ui_mainwindowclientbookencoder.h
  /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/mainwindowclientbookencoder.cpp
+ /usr/include/mysql/errmsg.h
+ /usr/include/mysql/field_types.h
+ /usr/include/mysql/my_command.h
+ /usr/include/mysql/my_compress.h
+ /usr/include/mysql/my_list.h
+ /usr/include/mysql/mysql.h
+ /usr/include/mysql/mysql/client_plugin.h
+ /usr/include/mysql/mysql/plugin_auth_common.h
+ /usr/include/mysql/mysql/udf_registration_types.h
+ /usr/include/mysql/mysql_com.h
+ /usr/include/mysql/mysql_time.h
+ /usr/include/mysql/mysql_version.h
  /usr/include/qt5/QtCore/QVariant
  /usr/include/qt5/QtCore/qabstractitemmodel.h
  /usr/include/qt5/QtCore/qalgorithms.h

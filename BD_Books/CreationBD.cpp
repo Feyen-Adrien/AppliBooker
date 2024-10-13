@@ -30,8 +30,8 @@ typedef struct {
 
 typedef struct {
   int id;
-  char[50] login;
-  char[50] password;
+  char login[50];
+  char password[50];
 } EMPLOYEES;
 
 typedef struct {
@@ -181,7 +181,7 @@ int main(int argc,char *argv[])
   if (mysql_query(connexion, "CREATE TABLE employees ("
                        "id INT(4) AUTO_INCREMENT PRIMARY KEY, "
                        "login VARCHAR(50), "
-                       "password VARCHAR(50);")){
+                       "password VARCHAR(50));")){
     finish_with_error(connexion);
   }
 
@@ -194,7 +194,7 @@ int main(int argc,char *argv[])
                        "clientNr INT, "
                        "adresse VARCHAR(100), "
                        "email VARCHAR(100), "
-                       "telNumber VARCHAR(20);")){
+                       "telNumber VARCHAR(20));")){
     finish_with_error(connexion);
   }
 
@@ -203,7 +203,7 @@ int main(int argc,char *argv[])
   if (mysql_query(connexion, "CREATE TABLE caddies ("
                        "id INT(4) AUTO_INCREMENT PRIMARY KEY, "
                        "clientId INT, "
-                       "date VARCHAR(), "
+                       "date DATE, "
                        "amount INT, "
                        "payed INT, "
                        "FOREIGN KEY (clientId) REFERENCES clients(id));")) {

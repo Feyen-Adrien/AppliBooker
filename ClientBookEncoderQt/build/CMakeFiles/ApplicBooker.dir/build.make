@@ -159,6 +159,7 @@ ApplicBooker: CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o
 ApplicBooker: CMakeFiles/ApplicBooker.dir/src/moc_mainwindowclientbookencoder.cpp.o
 ApplicBooker: CMakeFiles/ApplicBooker.dir/build.make
 ApplicBooker: /usr/lib64/libQt5Widgets.so.5.12.5
+ApplicBooker: /usr/lib64/mysql/libmysqlclient.so.21
 ApplicBooker: /usr/lib64/libQt5Gui.so.5.12.5
 ApplicBooker: /usr/lib64/libQt5Core.so.5.12.5
 ApplicBooker: CMakeFiles/ApplicBooker.dir/link.txt

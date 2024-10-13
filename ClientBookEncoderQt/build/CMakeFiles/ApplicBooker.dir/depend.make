@@ -4,6 +4,18 @@
 CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: ../include/OBEP.h
 CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: ../include/TCP.h
 CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: ../src/OBEP.cpp
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/errmsg.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/field_types.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/my_command.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/my_compress.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/my_list.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/mysql.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/mysql/client_plugin.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/mysql/plugin_auth_common.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/mysql/udf_registration_types.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/mysql_com.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/mysql_time.h
+CMakeFiles/ApplicBooker.dir/src/OBEP.cpp.o: /usr/include/mysql/mysql_version.h
 
 CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o: ../include/TCP.h
 CMakeFiles/ApplicBooker.dir/src/TCP.cpp.o: ../src/TCP.cpp
@@ -131,6 +143,18 @@ CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: ../include/TC
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: ../include/mainwindowclientbookencoder.h
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: ../include/ui_mainwindowclientbookencoder.h
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: ../src/mainwindowclientbookencoder.cpp
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/errmsg.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/field_types.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/my_command.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/my_compress.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/my_list.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/mysql.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/mysql/client_plugin.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/mysql/plugin_auth_common.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/mysql/udf_registration_types.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/mysql_com.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/mysql_time.h
+CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/mysql/mysql_version.h
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/qt5/QtCore/QVariant
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/qt5/QtCore/qabstractitemmodel.h
 CMakeFiles/ApplicBooker.dir/src/mainwindowclientbookencoder.cpp.o: /usr/include/qt5/QtCore/qalgorithms.h

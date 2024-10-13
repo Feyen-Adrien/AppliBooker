@@ -5,6 +5,18 @@ CMakeFiles/Serveur.dir/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/Cli
  ../../ClientBookEncoderQt/include/OBEP.h
  ../../ClientBookEncoderQt/include/TCP.h
  /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/OBEP.cpp
+ /usr/include/mysql/errmsg.h
+ /usr/include/mysql/field_types.h
+ /usr/include/mysql/my_command.h
+ /usr/include/mysql/my_compress.h
+ /usr/include/mysql/my_list.h
+ /usr/include/mysql/mysql.h
+ /usr/include/mysql/mysql/client_plugin.h
+ /usr/include/mysql/mysql/plugin_auth_common.h
+ /usr/include/mysql/mysql/udf_registration_types.h
+ /usr/include/mysql/mysql_com.h
+ /usr/include/mysql/mysql_time.h
+ /usr/include/mysql/mysql_version.h
 CMakeFiles/Serveur.dir/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/TCP.cpp.o
  ../../ClientBookEncoderQt/include/TCP.h
  /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/ClientBookEncoderQt/src/TCP.cpp
@@ -12,3 +24,15 @@ CMakeFiles/Serveur.dir/src/Serveur.cpp.o
  ../../ClientBookEncoderQt/include/OBEP.h
  ../../ClientBookEncoderQt/include/TCP.h
  /home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/Serveur/src/Serveur.cpp
+ /usr/include/mysql/errmsg.h
+ /usr/include/mysql/field_types.h
+ /usr/include/mysql/my_command.h
+ /usr/include/mysql/my_compress.h
+ /usr/include/mysql/my_list.h
+ /usr/include/mysql/mysql.h
+ /usr/include/mysql/mysql/client_plugin.h
+ /usr/include/mysql/mysql/plugin_auth_common.h
+ /usr/include/mysql/mysql/udf_registration_types.h
+ /usr/include/mysql/mysql_com.h
+ /usr/include/mysql/mysql_time.h
+ /usr/include/mysql/mysql_version.h

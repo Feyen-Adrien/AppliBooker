@@ -12,9 +12,15 @@ int sClient;
 char IpServeur[50] = "0.0.0.0";
 
 bool OBEP_Login_Client(const char* user, const char* password);
+void OBEP_GET_AUTHORS_Client();
+void OBEP_GET_SUBJECTS_Client();
+void OBEP_ADD_AUTHOR_Client();
+void OBEP_ADD_SUBJECT_Client();
+void OBEP_ADD_BOOK_Client();
 void OBEP_Logout();
-void OBEP_Operation(char op);
+bool OBEP_Operation(int op);
 void Echange(char* requete,char* reponse);
+
 
 MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
     : QMainWindow(parent)
@@ -298,6 +304,14 @@ void MainWindowClientBookEncoder::on_actionLogin_triggered() {
             else
             {
                 this->loginOk();
+                if(!OBEP_Operation(1))
+                {
+                    this->dialogError("LOGIN","Erreur lecture des auteurs !");
+                }
+                if(!OBEP_Operation(2))
+                {
+                    this->dialogError("LOGIN","Erreur lecture des sujets !");
+                }
             }
 
         }
@@ -310,6 +324,9 @@ void MainWindowClientBookEncoder::on_actionLogout_triggered() {
     // envoyer au serveur la commande
     OBEP_Logout();
     this->logoutOk();
+    clearComboBoxAuthors();
+    clearComboBoxSubjects();
+    clearTableBooks();
     
     
 }
@@ -347,6 +364,90 @@ bool OBEP_Login_Client(const char* user,const char* password)
     return onContinue;
 }
 
+void MainWindowClientBookEncoder::OBEP_GET_AUTHORS_Client()
+{
+    char SQL[200]="";
+    char nom[50];
+    int nbLus;
+
+    clearComboBoxAuthors();
+    while(strcmp(SQL,"FINRSQL")!=0)
+    {
+        memset(SQL,0,sizeof(SQL));// remet à zéro SQL // IMPORTANT CAR LA TAILLE EST MAL LUE SINON
+        printf("%s\n",SQL);
+        if ((nbLus = Receive(sClient,SQL)) < 0)
+        {
+            perror("Erreur de Receive");
+            ::close(sClient); // il faut les :: pour eviter l'ambiguité entre close de Qt et le close qui ferme la socket !
+            exit(1);
+        }
+        printf("%s\n",SQL);
+        char *ptr = strtok(SQL,"#");
+        int i = 0;
+        while(ptr !=NULL)
+        {
+            if(i==1)
+            {
+                strcpy(nom,ptr);
+                strcat(nom," ");
+            }
+            if(i==2)
+            {   
+                strcat(nom,ptr);
+            }
+            i++;
+            ptr=strtok(NULL,"#");
+        }
+        addComboBoxAuthors(nom); // ajout du nom
+    }
+}
+
+void MainWindowClientBookEncoder::OBEP_GET_SUBJECTS_Client()
+{
+    char SQL[200]="";
+    char nom[50];
+    int nbLus;
+
+    clearComboBoxSubjects();
+
+    while(strcmp(SQL,"FINRSQL")!=0)
+    {
+        memset(SQL,0,sizeof(SQL));// remet à zéro SQL // IMPORTANT CAR LA TAILLE EST MAL LUE SINON
+        printf("%s\n",SQL);
+        if ((nbLus = Receive(sClient,SQL)) < 0)
+        {
+            perror("Erreur de Receive");
+            ::close(sClient); // il faut les :: pour eviter l'ambiguité entre close de Qt et le close qui ferme la socket !
+            exit(1);
+        }
+        printf("%s\n",SQL);
+        char *ptr = strtok(SQL,"#");
+        int i = 0;
+        while(ptr !=NULL)
+        {
+            if(i==1)
+            {
+                strcpy(nom,ptr);
+            }
+            i++;
+            ptr=strtok(NULL,"#");
+        }
+    }
+        addComboBoxSubjects(nom); // ajout du sujet
+}
+void MainWindowClientBookEncoder::OBEP_ADD_AUTHOR_Client()
+{
+
+}
+void MainWindowClientBookEncoder::OBEP_ADD_SUBJECT_Client()
+{
+
+}
+void MainWindowClientBookEncoder::OBEP_ADD_BOOK_Client()
+{
+
+}
+
 void OBEP_Logout()
 {
     char requete[200],reponse[200];
@@ -358,9 +459,36 @@ void OBEP_Logout()
 }
 
 
-void OBEP_Operation(char op)
+bool MainWindowClientBookEncoder::OBEP_Operation(int op)
 {
+    char requete[200],reponse[200];
 
+    switch(op)
+    {
+        case 1: 
+            sprintf(requete,"GET_AUTHORS#");
+            Echange(requete,reponse);
+            if(strcmp(reponse,"GET_AUTHORS#ok")==0)
+            {
+                OBEP_GET_AUTHORS_Client();
+                return true;
+            }
+            return false;
+        case 2:
+            sprintf(requete,"GET_SUBJECTS#");
+            Echange(requete,reponse);
+            if(strcmp(reponse,"GET_SUBJECTS#ok")==0)
+            {
+                OBEP_ADD_SUBJECT_Client();
+                return true;
+            }
+            return false;
+
+
+
+        default: printf("Erreur lors du switch !");
+        return false;
+    }
 }
 
 // Définition de échange //
@@ -391,4 +519,7 @@ void Echange(char* requete,char* reponse)
     }
     reponse[nbLus] = 0;
 }
+
+
+
 

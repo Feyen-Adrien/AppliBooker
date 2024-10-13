@@ -7,15 +7,20 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <string.h>
+#include <mysql.h>
 #include "TCP.h"
 
 
 #define NB_MAX_CLIENTS 100
 
 
-bool OBEP(char* requete, char* reponse,int socket);
+bool OBEP(char* requete, char* reponse,int socket,MYSQL* c);
 bool OBEP_Login(const char* user,const char* password);
-int OBEP_Operation(char op,int a,int b);
+bool OBEP_GET_AUTHORS(char* reponse,MYSQL* c);
+bool OBEP_GET_SUBJECTS(char* reponse,MYSQL* c);
+bool OBEP_ADD_AUTHOR(MYSQL* c);
+bool OBEP_ADD_SUBJECT(MYSQL* c);
+bool OBEP_ADD_BOOK(MYSQL* c);
 void OBEP_Close();
 
 #endif

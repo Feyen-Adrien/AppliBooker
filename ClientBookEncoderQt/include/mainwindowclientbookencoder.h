@@ -41,6 +41,12 @@ public:
 
     void loginOk();
     void logoutOk();
+    void OBEP_GET_AUTHORS_Client();
+    void OBEP_GET_SUBJECTS_Client();
+    void OBEP_ADD_AUTHOR_Client();
+    void OBEP_ADD_SUBJECT_Client();
+    void OBEP_ADD_BOOK_Client();
+    bool OBEP_Operation(int op);
 
 private slots:
     void on_pushButtonAddAuthor_clicked();

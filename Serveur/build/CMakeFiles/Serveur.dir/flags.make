@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/Serveur/../ClientBookEncoderQt/include
+CXX_INCLUDES = -I/usr/include/mysql -I/home/student/HEPL2024-2025/RTI/Labo/eval1/AppliBooker/Serveur/../ClientBookEncoderQt/include
 
 CXX_FLAGS = -std=gnu++11
 
