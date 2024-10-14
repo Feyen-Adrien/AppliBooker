@@ -79,7 +79,42 @@ bool OBEP(char* requete, char* reponse,int socket,MYSQL* c)
 							printf("\t[THREAD %p] ADD_AUTHOR de %s %s\n",pthread_self(),n,p);
 							if(OBEP_ADD_AUTHOR(n,p,d,c)==true)
 							{
-								sprintf(reponse,"ADD_BOOK#ok");
+								sprintf(reponse,"ADD_AUTHOR#ok");
+							}
+						}
+						else
+						{
+							if(strcmp(ptr,"ADD_SUBJECT")==0)
+							{
+								char n[50];
+								strcpy(n,strtok(NULL,"#"));
+								printf("\t[THREAD %p] ADD_SUBJECT de %s\n",pthread_self(),n);
+								if(OBEP_ADD_SUBJECT(n,c)==true)
+								{
+									sprintf(reponse,"ADD_SUBJECT#ok");
+								}
+							}
+							else
+							{
+								if(strcmp(ptr,"ADD_BOOK")==0)
+								{
+									char t[50],isbn[20],pg[10],prix[10],annee[10],stock[10],auteur[50],sujet[40];
+									strcpy(t,strtok(NULL,"#"));
+									strcpy(isbn,strtok(NULL,"#"));
+									strcpy(pg,strtok(NULL,"#"));
+									strcpy(prix,strtok(NULL,"#"));
+									strcpy(annee,strtok(NULL,"#"));
+									strcpy(stock,strtok(NULL,"#"));
+									strcpy(auteur,strtok(NULL,"#"));
+									strcpy(sujet,strtok(NULL,"#"));
+									printf("\t[THREAD %p] ADD_BOOK  %s\n",pthread_self(),t);
+									if(OBEP_ADD_BOOK(t,isbn,pg,prix,annee,stock,auteur,sujet,c)==true)
+									{
+										my_ulonglong id = mysql_insert_id(c);
+										printf("%llu\n",(unsigned long long)id);
+										sprintf(reponse,"ADD_BOOK#ok#%llu",(unsigned long long)id);
+									}
+								}
 							}
 						}
 					}
@@ -161,8 +196,45 @@ bool OBEP_ADD_AUTHOR(const char* nom, const char* prenom, const char* date,MYSQL
 	printf("Requête INSERT réussie.\n");
 	return true; 
 }
-bool OBEP_ADD_SUBJECT();
-bool OBEP_ADD_BOOK();
+bool OBEP_ADD_SUBJECT(const char* nom, MYSQL * c)
+{
+	char r[100];
+
+	sprintf(r,"INSERT INTO subjects(name) values ('%s')",nom);
+	if(mysql_query(c,r) != 0)
+	{
+		printf("Erreur de mysql_query : %s\n",mysql_error(c));
+		exit(1);
+	}
+	printf("Requête INSERT réussie.\n");
+	return true; 
+}
+bool OBEP_ADD_BOOK(const char* titre, const char* isbn, const char* page ,const char* prix,const char* annee,const char* stock,const char* auteur,const char* sujet,MYSQL* c)
+{
+	char r[500];
+	char* pt;
+	char np[40];
+	char* nom;
+	char* prenom;
+
+	float p = strtof(prix,&pt);
+
+	strcpy(np,auteur);
+
+	nom=strtok(np," ");
+	prenom=strtok(NULL," ");
+
+	printf("%s\t%s\n",nom,prenom);
+
+	sprintf(r,"INSERT INTO books(author_id,subject_id,title,isbn,page_count,stock_quantity,price,publish_year)  values((SELECT id FROM authors WHERE upper(last_name)=upper('%s') and upper(first_name)=upper('%s')),(SELECT id FROM subjects WHERE upper(name)=upper('%s')),'%s','%s','%d','%d','%.2f','%d')",nom,prenom,sujet,titre,isbn,atoi(page),atoi(stock),p,atoi(annee));
+	if(mysql_query(c,r) != 0)
+	{
+		printf("Erreur de mysql_query : %s\n",mysql_error(c));
+		exit(1);
+	}
+	printf("Requête INSERT réussie.\n");
+	return true; 
+}
 
 
 

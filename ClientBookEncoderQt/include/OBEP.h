@@ -22,8 +22,8 @@ bool OBEP_GET_AUTHORS(char* reponse,MYSQL* c);
 bool OBEP_GET_SUBJECTS(char* reponse,MYSQL* c);
 bool OBEP_GET_BOOKS(char* reponse,MYSQL* c);
 bool OBEP_ADD_AUTHOR(const char* nom, const char* prenom, const char* date,MYSQL* c);
-bool OBEP_ADD_SUBJECT(MYSQL* c);
-bool OBEP_ADD_BOOK(MYSQL* c);
+bool OBEP_ADD_SUBJECT(const char* nom,MYSQL* c);
+bool OBEP_ADD_BOOK(const char* titre, const char* isbn, const char* page ,const char* prix,const char* annee,const char* stock,const char* auteur,const char* sujet,MYSQL* c);
 void OBEP_Close();
 
 #endif

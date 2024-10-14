@@ -9,14 +9,16 @@
 using namespace std;
 
 int sClient;
+int NbLivre;
 char IpServeur[50] = "0.0.0.0";
 
 bool OBEP_Login_Client(const char* user, const char* password);
 bool OBEP_ADD_AUTHOR_Client(const char* nom, const char* prenom, const char* date);
-void OBEP_ADD_SUBJECT_Client();
-void OBEP_ADD_BOOK_Client();
+bool OBEP_ADD_SUBJECT_Client(const char *nom);
+bool OBEP_ADD_BOOK_Client(const char* titre, const char* isbn, int page ,float prix,int annee,int stock,const char* auteur,const char* sujet);
 void OBEP_Logout();
 bool isValidDate(const char* date);
+bool verifier_isbn(const char *isbn);
 void Echange(char* requete,char* reponse);
 
 
@@ -280,10 +282,77 @@ void MainWindowClientBookEncoder::on_pushButtonAddAuthor_clicked() {
 
 void MainWindowClientBookEncoder::on_pushButtonAddSubject_clicked() {
     string name = this->dialogInputText("Nouveau sujet","Nom ?");
+    if(strlen(name.c_str())==0)
+    {
+        this->dialogError("Nouveau sujet","Veuillez entrer un nom pour le sujet !");
+    }
+    else
+    {
+        if(!OBEP_ADD_SUBJECT_Client(name.c_str()))
+        {
+            this->dialogError("Nouveau sujet","Erreur lors de l'insertion !");
+        }
+        else
+        {
+            if(!OBEP_Operation(2))
+            {
+                this->dialogError("Nouveau sujet","Erreur lecture des sujets !");
+            }
+        }
+    }
     cout << "Nom : " << name << endl;
 }
 
 void MainWindowClientBookEncoder::on_pushButtonAddBook_clicked() {
+    if(strlen(this->getTitle().c_str())==0)
+    {
+        this->dialogError("Ajouter livre","Veuillez entrer un titre !");
+    }
+    else
+    {
+        if (verifier_isbn(this->getIsbn().c_str()) == false)
+        {
+            this->dialogError("Ajouter livre","Format incorrect pour ISBN !");
+        }
+        else
+        {
+            if(this->getPageCount()<1)
+            {
+                this->dialogError("Ajouter livre","Le nombre de page du livre doit être >0 !");
+            }
+            else
+            {
+                if(this->getPrice() <= 0.0)
+                {
+                    this->dialogError("Ajouter livre","Le prix doit être sup ou égal à 0 !");
+                }
+                else
+                {
+                    if (this->getStockQuantity() <0)
+                    {
+                        this->dialogError("Ajouter livre","La quantité doit être supérieur à 0");
+                    }
+                    else
+                    {
+                        if(!OBEP_ADD_BOOK_Client(this->getTitle().c_str(),this->getIsbn().c_str(),this->getPageCount(),this->getPrice(),this->getPublishYear(),this->getStockQuantity(),this->getSelectionAuthor().c_str(),this->getSelectionSubject().c_str()))
+                        {
+                            this->dialogError("Ajouter livre","Erreur lors de l'insertion !");
+                        }
+                        else
+                        {
+                            /*if(!OBEP_Operation(3))
+                            {
+                                this->dialogError("Ajouter livre","Erreur lecture des livres !");
+                            }*/
+
+                        addTupleTableBooks(NbLivre,this->getTitle(),this->getSelectionAuthor(),this->getSelectionSubject(),this->getIsbn(),this->getPageCount(),this->getPublishYear(),this->getPrice(),this->getStockQuantity());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     cout << "title = " << this->getTitle() << endl;
     cout << "Isbn = " << this->getIsbn() << endl;
     cout << "PageCount = " << this->getPageCount() << endl;
@@ -339,10 +408,10 @@ void MainWindowClientBookEncoder::on_actionLogin_triggered() {
                 {
                     this->dialogError("LOGIN","Erreur lecture des sujets !");
                 }
-                /*if(!OBEP_Operation(3)) pas appeler car il doit seulement voir les livres qu'il encode lui
+                /*if(!OBEP_Operation(3)) //pas appeler car il doit seulement voir les livres qu'il encode lui
                 {
                     this->dialogError("LOGIN","Erreur lecture des livres !");
-                }*/ 
+                }*/
             }
 
         }
@@ -566,13 +635,56 @@ bool OBEP_ADD_AUTHOR_Client(const char* nom, const char* prenom, const char* dat
 
     return onContinue;
 }
-void OBEP_ADD_SUBJECT_Client()
+bool OBEP_ADD_SUBJECT_Client(const char *nom)
 {
+    char requete[200],reponse[200];
+    bool onContinue = true;
 
+    // Construction de la requête 
+    sprintf(requete,"ADD_SUBJECT#%s",nom);
+
+    // Echange entre le serveur et client
+    Echange(requete,reponse);
+
+    char *ptr = strtok(reponse,"#");
+    ptr = strtok(NULL,"#");
+    if(strcmp(ptr,"ok") == 0) printf("ADD_SUBJECT OK. \n");
+    else
+    {
+        ptr = strtok(NULL,"#");
+        printf("Erreur de ADD_SUBJECT: %s\n",ptr);
+        onContinue=false;
+    }
+
+    return onContinue;
 }
-void OBEP_ADD_BOOK_Client()
+bool OBEP_ADD_BOOK_Client(const char* titre, const char* isbn, int page ,float prix,int annee,int stock,const char* auteur,const char* sujet)
 {
+    char requete[200],reponse[200];
+    bool onContinue = true;
 
+    // Construction de la requête 
+    sprintf(requete,"ADD_BOOK#%s#%s#%d#%f#%d#%d#%s#%s",titre,isbn,page,prix,annee,stock,auteur,sujet);
+
+    // Echange entre le serveur et client
+    Echange(requete,reponse);
+
+    char *ptr = strtok(reponse,"#");
+    ptr = strtok(NULL,"#");
+    if(strcmp(ptr,"ok") == 0)
+    {
+       printf("ADD_BOOK OK. \n");
+       char *p = strtok(NULL,"#"); 
+       NbLivre = atoi(p);
+    } 
+    else
+    {
+        ptr = strtok(NULL,"#");
+        printf("Erreur de ADD_BOOK: %s\n",ptr);
+        onContinue=false;
+    }
+
+    return onContinue;
 }
 
 void OBEP_Logout()
@@ -660,7 +772,34 @@ bool isValidDate(const char* date) {
 
     return true; // Format valide
 }
+bool verifier_isbn(const char *isbn) 
+{
+    // Vérifie la longueur de la chaîne
+    if (strlen(isbn) != 14) {
+        return false; // Longueur incorrecte
+    }
+    
+    // Vérifie les trois premiers chiffres
+    for (int i = 0; i < 3; i++) {
+        if (!isdigit(isbn[i])) {
+            return false; // Ce n'est pas un chiffre
+        }
+    }
 
+    // Vérifie le tiret
+    if (isbn[3] != '-') {
+        return false; // Tiret manquant
+    }
+
+    // Vérifie les dix chiffres suivants
+    for (int i = 4; i < 14; i++) {
+        if (!isdigit(isbn[i])) {
+            return false; // Ce n'est pas un chiffre
+        }
+    }
+
+    return true; // Format valide
+}
 
 // Définition de échange //
 void Echange(char* requete,char* reponse)
