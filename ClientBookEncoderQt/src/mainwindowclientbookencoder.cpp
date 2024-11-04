@@ -10,7 +10,7 @@ using namespace std;
 
 int sClient;
 int NbLivre;
-char IpServeur[50] = "0.0.0.0";
+char IpServeur[50] = "192.168.21.130";
 
 bool OBEP_Login_Client(const char* user, const char* password);
 bool OBEP_ADD_AUTHOR_Client(const char* nom, const char* prenom, const char* date);
