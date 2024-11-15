@@ -1,7 +1,11 @@
 package GUI.JDialog;
 
 import javax.swing.*;
+
 import java.awt.event.*;
+import java.io.IOException;
+
+
 
 public class ConnexionClient extends JDialog {
     private JPanel contentPane;
@@ -20,7 +24,7 @@ public class ConnexionClient extends JDialog {
     private JPanel controlPanel;
     private JPanel bouttonPanel;
 
-    public ConnexionClient() {
+    public ConnexionClient() throws IOException {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonConnexion);
@@ -28,17 +32,8 @@ public class ConnexionClient extends JDialog {
         setLocationRelativeTo(null);
         pack();// permet de prendre la taille minimale ou préféré
 
-        buttonConnexion.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
 
-        buttonAnnuler.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonAnnuler.addActionListener(e -> onCancel());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -49,26 +44,30 @@ public class ConnexionClient extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK() {
-        // add your code here
-        dispose();
-    }
 
     private void onCancel() {
-        // add your code here if necessary
         dispose();
+    }
+
+
+    // SETTERS / GETTERS
+    public String getNom()
+    {
+        return textFieldNom.getText();
+    }
+    public String getPrenom()
+    {
+        return textFieldPrenom.getText();
+    }
+
+    public JButton getButtonConnexion() {
+        return buttonConnexion;
     }
 
     public static void main(String[] args) {
-        ConnexionClient dialog = new ConnexionClient();
-        dialog.setVisible(true);
-        System.exit(0);
+        // vide
     }
 }
