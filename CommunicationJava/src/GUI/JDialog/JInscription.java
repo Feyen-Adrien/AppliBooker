@@ -28,12 +28,6 @@ public class JInscription extends JDialog {
         setLocationRelativeTo(null);
         pack();// permet de prendre la taille minimale ou préféré
 
-        buttonInscription.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
-
         buttonAnnuler.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
@@ -56,14 +50,23 @@ public class JInscription extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK() {
-        // add your code here
-        dispose();
-    }
-
     private void onCancel() {
         // add your code here if necessary
         dispose();
+    }
+
+    // SETTERS / GETTERS
+    public String getNom()
+    {
+        return textFieldNom.getText();
+    }
+    public String getPrenom()
+    {
+        return textFieldPrenom.getText();
+    }
+
+    public JButton getButtonInscription() {
+        return buttonInscription;
     }
 
     public static void main(String[] args) {

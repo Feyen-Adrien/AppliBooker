@@ -1,9 +1,7 @@
 package GUI.Jframe;
 
 import GUI.JDialog.*;
-import ProtocoleBSPP.ReponseLOGIN;
-import ProtocoleBSPP.RequeteLOGIN;
-import ProtocoleBSPP.RequeteLOGOUT;
+import ProtocoleBSPP.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +18,7 @@ public class ClientAchat extends JFrame {
     private Socket socket;
     private String nom;
     private String prenom;
+    private int NrClient=-1;
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private JButton rechercherButton;
@@ -88,6 +87,45 @@ public class ClientAchat extends JFrame {
         // ajout d'action aux buttons du Jpopupmenu
         itemInscription.addActionListener(e1 -> {
             inscription  = new JInscription();
+            inscription.getButtonInscription().addActionListener(e3->{
+                if(inscription.getNom().isEmpty())
+                {
+                    Error("Veuillez entrer un nom");
+                }
+                else
+                {
+                    if(inscription.getPrenom().isEmpty())
+                    {
+                        Error("Veuillez entrer un prenom");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            connexionServeur();
+                            RequeteINSCRIPTION requete = new RequeteINSCRIPTION(inscription.getNom(),inscription.getPrenom());
+                            out.writeObject(requete);
+                            ReponseINSCRIPTION reponse = (ReponseINSCRIPTION) in.readObject();
+                            if(reponse.getNrClient()!= -1)
+                            {
+                                setNom(inscription.getNom());
+                                setPrenom(inscription.getPrenom());
+                                NrClient = reponse.getNrClient();
+                                Succes("Inscription réussie ! Numéro client = " + NrClient);
+                                inscription.dispose();
+                                connected(); // active les bouttons
+                            }
+                            else
+                            {
+                                Error("Le client existe déjà");
+                                deconnexionServeur();
+                            }
+                        } catch (ClassNotFoundException | IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            });
             inscription.setVisible(true);
         });// permet d'afficher une Jdialog pour l'inscription
         itemConnexion.addActionListener(e1 -> {
@@ -136,13 +174,13 @@ public class ClientAchat extends JFrame {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
         });// permet d'afficher une JDialog pour l connexion
         itemDeconnexion.addActionListener(e1 -> {
             RequeteLOGOUT requete = new RequeteLOGOUT(getNom());
             try {
                 out.writeObject(requete);
                 Succes("Client bien déconnecté");
+                NrClient = -1;
                 disconnected();
             } catch (IOException e) {
                 throw new RuntimeException(e);

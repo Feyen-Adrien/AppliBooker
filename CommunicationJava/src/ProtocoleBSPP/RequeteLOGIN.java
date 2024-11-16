@@ -19,7 +19,7 @@ public class RequeteLOGIN implements Requete {
     public void setUserName(String userName) {
         this.userName = userName;
     }
-    public void setFirstName(String password) {
-        this.firstName = password;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 }
