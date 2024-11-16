@@ -36,10 +36,9 @@ public class ConnectDB {
                 }
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(dataBaseName,userName,passWord);
-
             }
         } catch (SQLException | ClassNotFoundException e) {
-            Logger.getLogger(ConnectDB.class.getName()).log(Level.SEVERE,null,e);
+            Logger.getLogger(ConnectDB.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     public static void close()

@@ -3,15 +3,16 @@ package ProtocoleBSPP;
 import ServeurTCP.Reponse;
 
 public class ReponseLOGIN implements Reponse {
-    private boolean valide;
+    private int nrClient;
 
-    ReponseLOGIN(boolean valide) {
-        setValide(valide);
+
+    ReponseLOGIN(int nrClient) {
+        setNrClient(nrClient);
     }
-    public boolean isValide() {
-        return valide;
+    public int getNrClient() {
+        return nrClient;
     }
-    public void setValide(boolean valide) {
-        this.valide = valide;
+    public void setNrClient(int nrClient) {
+        this.nrClient = nrClient;
     }
 }

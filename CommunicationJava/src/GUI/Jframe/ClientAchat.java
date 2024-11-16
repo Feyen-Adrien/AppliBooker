@@ -150,11 +150,12 @@ public class ClientAchat extends JFrame {
                                 RequeteLOGIN requete = new RequeteLOGIN(connexion.getNom(),connexion.getPrenom());
                                 out.writeObject(requete);
                                 ReponseLOGIN reponse = (ReponseLOGIN) in.readObject();
-                                if(reponse.isValide())
+                                if(reponse.getNrClient() != -1)
                                 {
                                     setNom(connexion.getNom());
                                     setPrenom(connexion.getPrenom());
-                                    Succes("Connexion réussi !");
+                                    NrClient = reponse.getNrClient();
+                                    Succes("Connexion réussi ! Numéro de client = " + NrClient);
                                     connexion.dispose();
                                     connected(); // active les bouttons
                                 }

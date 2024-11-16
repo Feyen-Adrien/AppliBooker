@@ -9,17 +9,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import static model.dao.ConnectDB.close;
+
 public class BSPP implements Protocole {
     private Logger logger;
-    private HashMap<String, Socket> clientsConnected;
-    private HashMap<String, String> NomPrenom;
     ConnectDB connexion;
 
     public BSPP(Logger log) {
         logger = log;
-        NomPrenom = new HashMap<>();
-        clientsConnected = new HashMap<>();
-        NomPrenom.put("Adrien","Feyen");
     }
 
     @Override
@@ -42,72 +39,92 @@ public class BSPP implements Protocole {
 
     private synchronized ReponseLOGIN TraiteRequeteLOGIN(RequeteLOGIN requete, Socket socket)
     {
-       logger.Trace("Requete LOGIN reçue de " + requete.getUserName());
-       // accès BD ici normalement
-        String Nom = NomPrenom.get(requete.getUserName());
-        if(Nom!=null)
-        {
-            if(Nom.equals(requete.getFirstName()))
-            {
+        logger.Trace("Requete LOGIN reçue de " + requete.getUserName());
+
+        connexion = new ConnectDB();
+        PreparedStatement stmt = null;
+        ResultSet res = null;
+
+        try {
+            // Préparer la requête SQL pour vérifier les informations de l'utilisateur
+            String sql = "SELECT * FROM clients WHERE name = ? AND firstname = ?";
+            stmt = connexion.getConnection().prepareStatement(sql);
+            stmt.setString(1, requete.getUserName());
+            stmt.setString(2, requete.getFirstName());
+
+            res = stmt.executeQuery();
+
+            if (res.next()) {
+                // Si un utilisateur correspondant est trouvé, il est connecté avec succès
                 String ipPortClient = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
-                logger.Trace(requete.getUserName() + "est correctement loggé au serveur(ip:port) : " + ipPortClient);
-                clientsConnected.put(requete.getUserName(), socket);
-                return new ReponseLOGIN(true);
+                logger.Trace(requete.getUserName() + " est correctement loggé au serveur (ip:port) : " + ipPortClient);
+
+                return new ReponseLOGIN(res.getInt("clientNr"));
+            } else {
+                // Aucun utilisateur correspondant trouvé
+                logger.Trace(requete.getUserName() + " : mauvais identifiants.");
+                return new ReponseLOGIN(-1); // Répondre avec échec
+            }
+        } catch (SQLException e) {
+            logger.Trace("Erreur SQL lors de la vérification de l'utilisateur : " + e.getMessage());
+            return new ReponseLOGIN(-1);
+        } finally {
+            // Nettoyer les ressources pour éviter les fuites
+            try {
+                if (res != null) res.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                logger.Trace("Erreur lors de la fermeture des ressources SQL : " + e.getMessage());
             }
         }
-
-        logger.Trace(requete.getUserName() + " : mauvais mdp");
-        return new ReponseLOGIN(false);
     }
 
     private synchronized void TraiteRequeteLOGOUT(RequeteLOGOUT requete, Socket socket)
     {
         logger.Trace("Requete LOGOUT reçue de " + requete.getUserName());
-        if(clientsConnected.remove(requete.getUserName(), socket))
-        {
-            logger.Trace(requete.getUserName() + " correctement déconnecté du serveur");
-        }
-        else
-        {
-            logger.Trace("Erreur deconnexion coté serveur");
-        }
+        logger.Trace(requete.getUserName() + " correctement déconnecté du serveur");
     }
 
     private synchronized ReponseINSCRIPTION TraiteRequeteINSCRIPTION(RequeteINSCRIPTION requete, Socket socket)
     {
         connexion = new ConnectDB();// connexion BD
-        PreparedStatement stmt;
-        ResultSet res;
-        int ide = 1000;
-        String sql = "SELECT name,fisrtname  FROM clients WHERE name = " + requete.getUserName() +"AND firstname = " + requete.getFirstName();
+        PreparedStatement stmt, pstmt;
+        ResultSet res,res2;
+        int ide;
 
         try
         {
+            String sql = "SELECT name,firstname  FROM clients WHERE name = ? AND firstname = ?";
             stmt = connexion.getConnection().prepareStatement(sql);
+            stmt.setString(1, requete.getUserName());
+            stmt.setString(2, requete.getFirstName());
             res = stmt.executeQuery();
-            stmt.close();
             if(!res.next())
             {
-                sql = "INSERT INTO clients (name,fisrtname ) VALUES (?,?)";
-                stmt = connexion.getConnection().prepareStatement(sql);
-                stmt.setString(1, requete.getUserName());
-                stmt.setString(2, requete.getFirstName());
-                stmt.executeUpdate();
-                res = stmt.getGeneratedKeys();
-                stmt.close();
-                res.next();
-                ide += res.getInt(1);
+                sql = "INSERT INTO clients (name,firstname ) VALUES (?,?)";
+                pstmt = connexion.getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+                pstmt.setString(1, requete.getUserName());
+                pstmt.setString(2, requete.getFirstName());
+                pstmt.executeUpdate();
+                res2 = pstmt.getGeneratedKeys();
+                res2.next();
+                System.out.println(res2.getInt(1));
+                ide = res2.getInt(1);
+                pstmt.close();
                 sql = "UPDATE clients SET clientNr = ? WHERE id = ?";
-                stmt = connexion.getConnection().prepareStatement(sql);
-                stmt.setInt(1, res.getInt(1));
-                stmt.setInt(2, ide);
-                stmt.executeUpdate();
+                pstmt = connexion.getConnection().prepareStatement(sql);
+                pstmt.setInt(1, ide+1000);
+                pstmt.setInt(2, ide);
+                pstmt.executeUpdate();
+                pstmt.close();
                 stmt.close();
                 logger.Trace("Client crée ! ");
-                return new ReponseINSCRIPTION(ide);
+                close();//ferme la connection à la BD
+                return new ReponseINSCRIPTION(ide+1000);
             }
             else {
                 logger.Trace("Client existe déjà !");
+                close();
                 return new ReponseINSCRIPTION(-1);
             }
         } catch (SQLException e) {
