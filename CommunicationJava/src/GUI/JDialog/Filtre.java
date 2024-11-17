@@ -1,7 +1,14 @@
 package GUI.JDialog;
 
+import ProtocoleBSPP.ReponseGetAuteur;
+import ProtocoleBSPP.RequeteGetAuteur;
+import model.entity.Author;
+
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class Filtre extends JDialog {
     private JPanel Filtre;
@@ -18,13 +25,26 @@ public class Filtre extends JDialog {
     private JLabel Sujet;
     private JLabel Prix;
 
-    public Filtre() {
+    public Filtre(ObjectInputStream in, ObjectOutputStream out) {
         setContentPane(Filtre);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         setTitle("Filtre");
         setLocationRelativeTo(null);
         setSize(500,350);
+
+        RequeteGetAuteur requeteGetAuteur = new RequeteGetAuteur();
+        try {
+            out.writeObject(requeteGetAuteur);
+            ReponseGetAuteur reponseGetAuteur = new ReponseGetAuteur();
+            reponseGetAuteur = (ReponseGetAuteur) in.readObject();
+
+            // parcourir le tableau recu..
+
+
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -65,8 +85,6 @@ public class Filtre extends JDialog {
     }
 
     public static void main(String[] args) {
-        Filtre dialog = new Filtre();
-        dialog.setVisible(true);
-        System.exit(0);
+      //
     }
 }

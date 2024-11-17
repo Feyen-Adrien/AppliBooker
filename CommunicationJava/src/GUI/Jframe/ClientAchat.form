@@ -43,7 +43,12 @@
             </constraints>
             <properties/>
             <border type="none"/>
-            <children/>
+            <children>
+              <component id="bd6e1" class="javax.swing.JTable" binding="TableLivre">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
           </scrollpane>
           <component id="c5709" class="javax.swing.JLabel" binding="quantiteLabel">
             <constraints>
@@ -91,7 +96,12 @@
             </constraints>
             <properties/>
             <border type="none"/>
-            <children/>
+            <children>
+              <component id="abd49" class="javax.swing.JTable" binding="PanierTable">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
           </scrollpane>
           <component id="c58cb" class="javax.swing.JLabel" binding="panierLabel">
             <constraints>

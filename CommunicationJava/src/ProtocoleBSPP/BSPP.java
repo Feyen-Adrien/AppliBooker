@@ -1,7 +1,10 @@
 package ProtocoleBSPP;
 
 import ServeurTCP.*;
+import model.dao.AuthorDAO;
+import model.dao.BookDAO;
 import model.dao.ConnectDB;
+import model.dao.SubjectDAO;
 
 import java.net.Socket;
 import java.sql.PreparedStatement;
@@ -13,7 +16,7 @@ import static model.dao.ConnectDB.close;
 
 public class BSPP implements Protocole {
     private Logger logger;
-    ConnectDB connexion;
+    private ConnectDB connexion;
 
     public BSPP(Logger log) {
         logger = log;
@@ -33,6 +36,10 @@ public class BSPP implements Protocole {
         if(requete instanceof RequeteLOGOUT) TraiteRequeteLOGOUT((RequeteLOGOUT)requete, socket);
 
         if(requete instanceof RequeteINSCRIPTION) return TraiteRequeteINSCRIPTION((RequeteINSCRIPTION)requete, socket);
+
+        if(requete instanceof RequeteRECHERCHER) return TraiteRequeteRECHERCHER((RequeteRECHERCHER)requete, socket);
+
+        if(requete instanceof RequeteGetAuteur) return TraiteRequeteGetAuteur();
 
         return null;
     }
@@ -130,5 +137,31 @@ public class BSPP implements Protocole {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private synchronized ReponseRECHERCHER TraiteRequeteRECHERCHER(RequeteRECHERCHER requete, Socket socket)
+    {
+        // filtre ici
+        AuthorDAO authorDAO;
+        BookDAO bookDAO;
+        SubjectDAO subjectDAO;
+        return null;
+    }
+
+    private synchronized ReponseGetAuteur TraiteRequeteGetAuteur()
+    {
+        AuthorDAO authorDAO;
+
+        ReponseGetAuteur reponseGetAuteur = new ReponseGetAuteur();
+
+        authorDAO = AuthorDAO.getInstance();
+
+        try {
+            reponseGetAuteur.setListeAuteur(authorDAO.getAllAuthors());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return reponseGetAuteur;
     }
 }

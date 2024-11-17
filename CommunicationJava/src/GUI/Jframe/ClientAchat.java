@@ -4,6 +4,7 @@ import GUI.JDialog.*;
 import ProtocoleBSPP.*;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,6 +20,10 @@ public class ClientAchat extends JFrame {
     private String nom;
     private String prenom;
     private int NrClient=-1;
+    private String Auteur = "";
+    private String Titre = "";
+    private String Sujet ="";
+    private int Prix = -1;
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private JButton rechercherButton;
@@ -40,6 +45,8 @@ public class ClientAchat extends JFrame {
     private JTextField prixTotalTextField;
     private JScrollPane listeLivreScrollPanel;
     private JToolBar clientToolBar;
+    private JTable PanierTable;
+    private JTable TableLivre;
     private final JPopupMenu popupMenu;
     private final JMenuItem itemConnexion;
     private final JMenuItem itemInscription;
@@ -54,6 +61,15 @@ public class ClientAchat extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(700, 550);
         setLocationRelativeTo(null);
+
+        // Ajout du nom des colonnes à la liste et au pnier
+
+        DefaultTableModel modele = new DefaultTableModel(null, new String[]{"Auteur", "Sujet", "Titre","ISBN","Page","Stock","Prix","Année de publication"});
+        TableLivre.setModel(modele);
+        modele = new DefaultTableModel(null,new String[]{"Titre", "Auteur", "Quantité","Prix"});
+        PanierTable.setModel(modele);
+
+
         // configuration du JPopupMenu
         popupMenu = new JPopupMenu();
 
@@ -196,7 +212,7 @@ public class ClientAchat extends JFrame {
 
         // affichage du filtre
         filtreButton.addActionListener(e -> {
-            Filtre filtre = new Filtre();
+            Filtre filtre = new Filtre(in,out);
             filtre.setVisible(true);
         });
 
@@ -310,5 +326,37 @@ public class ClientAchat extends JFrame {
     }
     public void setPrenom(String firstName) {
         this.prenom = firstName;
+    }
+
+    public String getAuteur() {
+        return Auteur;
+    }
+
+    public void setAuteur(String auteur) {
+        Auteur = auteur;
+    }
+
+    public String getTitre() {
+        return Titre;
+    }
+
+    public void setTitre(String titre) {
+        Titre = titre;
+    }
+
+    public String getSujet() {
+        return Sujet;
+    }
+
+    public void setSujet(String sujet) {
+        Sujet = sujet;
+    }
+
+    public int getPrix() {
+        return Prix;
+    }
+
+    public void setPrix(int prix) {
+        Prix = prix;
     }
 }
