@@ -49,6 +49,11 @@ public class BSPP implements Protocole {
 
         if(requete instanceof  RequeteGetCaddy) return  TraiteRequeteGetCaddy((RequeteGetCaddy) requete);
 
+        if(requete instanceof RequeteDELETE_CADDY_ITEM) return TraiteRequeteDeleteCaddyItem((RequeteDELETE_CADDY_ITEM) requete);
+
+        if(requete instanceof RequeteUPDATE_CADDY_PAYED) return TraiteRequeteUpdateCaddyItemPayed((RequeteUPDATE_CADDY_PAYED) requete);
+
+        if(requete instanceof RequeteDELETE_CADDY) return TraiteRequeteDeleteCaddy((RequeteDELETE_CADDY) requete);
 
         return null;
     }
@@ -243,17 +248,20 @@ public class BSPP implements Protocole {
                 bookDAO.updateBook(book);
                 if(requete.isCaddyCreated()==-1)
                 {
-                    caddies = new Caddies(null,requete.getIdClient(),null,requete.getQuantite(),null);
+                    caddies = new Caddies(null,requete.getIdClient(),null,0,null);
                     caddiesDAO.addCaddies(caddies);
-                    caddyItems = new CaddyItems(null,caddies.getCaddyId(),requete.getIdLivre(),requete.getQuantite());
+                    logger.Trace("Id caddy créee : " + caddies.getId());
+                    caddyItems = new CaddyItems(null,caddies.getId(),requete.getIdLivre(),requete.getQuantite());
                     caddyItemsDAO.addCaddyItems(caddyItems);
+                    caddiesDAO.updateCaddiesAmount(caddies.getId(),book.getPrice()*requete.getQuantite());
 
-                    return new ReponseADD_CADDY_ITEM(caddies.getCaddyId());
+                    return new ReponseADD_CADDY_ITEM(caddies.getId());
                 }
                 else
                 {
                     caddyItems = new CaddyItems(null,requete.isCaddyCreated(),requete.getIdLivre(),requete.getQuantite());
                     caddyItemsDAO.addCaddyItems(caddyItems);
+                    caddiesDAO.updateCaddiesAmount(requete.isCaddyCreated(), book.getPrice()*book.getStock_quantity());
                     return new ReponseADD_CADDY_ITEM(requete.isCaddyCreated());
                 }
 
@@ -270,20 +278,75 @@ public class BSPP implements Protocole {
     private synchronized ReponseGetCaddy TraiteRequeteGetCaddy(RequeteGetCaddy requete)
     {
         CaddyItemsDAO caddyItemsDAO;
+        CaddiesDAO caddiesDAO;
 
         ReponseGetCaddy reponseGetCaddy = new ReponseGetCaddy();
 
+
         caddyItemsDAO = CaddyItemsDAO.getInstance();
+        caddiesDAO = CaddiesDAO.getInstance();
 
         logger.Trace("Requête GetCaddy reçue");
 
         try {
             reponseGetCaddy.setCaddyItems(caddyItemsDAO.getCaddyItems(requete.getNrCaddy()));
+            reponseGetCaddy.setMaxAmount(caddiesDAO.getCaddiesById(requete.getNrCaddy()).getAmount());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         return reponseGetCaddy;
+    }
+
+    private synchronized ReponseDELETE_CADDY_ITEM TraiteRequeteDeleteCaddyItem(RequeteDELETE_CADDY_ITEM requete)
+    {
+        CaddyItemsDAO caddyItemsDAO = CaddyItemsDAO.getInstance();
+        ReponseDELETE_CADDY_ITEM reponseDELETECaddyItem = new ReponseDELETE_CADDY_ITEM();
+
+        logger.Trace("Requête DeleteCaddyItem reçue");
+        try {
+            caddyItemsDAO.deleteCaddyItems(requete.getIdLivre());
+            reponseDELETECaddyItem.setValid(true);
+        } catch (SQLException e) {
+            logger.Trace("Error lors du delete caddyItem : " + e.getMessage());
+            reponseDELETECaddyItem.setValid(false);
+        }
+        return reponseDELETECaddyItem;
+    }
+
+    private synchronized ReponseUPDATE_CADDY_PAYED TraiteRequeteUpdateCaddyItemPayed(RequeteUPDATE_CADDY_PAYED requete)
+    {
+        CaddiesDAO caddiesDAO = CaddiesDAO.getInstance();
+        ReponseUPDATE_CADDY_PAYED reponseUPDATECaddyPayed = new ReponseUPDATE_CADDY_PAYED();
+
+        logger.Trace("Requête UpdateCaddyItemPayed reçue");
+        try
+        {
+            caddiesDAO.updateCaddiesPayed(requete.getIdCaddy());
+            reponseUPDATECaddyPayed.setValide(true);
+        } catch (SQLException e) {
+            logger.Trace("Error lors du UpdateCaddyItemPayed : " + e.getMessage());
+            reponseUPDATECaddyPayed.setValide(false);
+        }
+        return reponseUPDATECaddyPayed;
+    }
+
+    private synchronized ReponseDELETE_CADDY TraiteRequeteDeleteCaddy(RequeteDELETE_CADDY requete)
+    {
+        CaddiesDAO caddiesDAO = CaddiesDAO.getInstance();
+        ReponseDELETE_CADDY reponseDELETECaddy = new ReponseDELETE_CADDY();
+
+        logger.Trace("Requête DeleteCaddy reçue");
+        try
+        {
+            caddiesDAO.deleteCaddyItemsByCaddyId(requete.getIdCaddy());
+            caddiesDAO.deleteCaddies(requete.getIdCaddy());
+            reponseDELETECaddy.setValid(true);
+        } catch (SQLException e) {
+            logger.Trace("Error lors du DeleteCaddy : " + e.getMessage());
+            reponseDELETECaddy.setValid(false);
+        }
+        return reponseDELETECaddy;
     }
 
 }

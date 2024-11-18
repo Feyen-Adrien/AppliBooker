@@ -1,4 +1,4 @@
-package src.Helpers;
+package Helpers;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -33,7 +33,7 @@ public class ServerConnection {
         byte[] tailleBytes = new byte[4];
         in.readFully(tailleBytes);
 
-        // Convertir les 4 octets en un entier en utilisant le boutisme "little-endian"
+        // Convertir les 4 octets en un entier en "little-endian"
         int taille = ((tailleBytes[3] & 0xFF) << 24) |
                 ((tailleBytes[2] & 0xFF) << 16) |
                 ((tailleBytes[1] & 0xFF) << 8) |

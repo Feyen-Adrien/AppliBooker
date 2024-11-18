@@ -106,7 +106,7 @@ public class CaddiesDAO {
     }
 
     //UPDATE Amount
-    public void updateCaddiesAmount(int id, int amountToAdd) throws SQLException {
+    public void updateCaddiesAmount(int id, float amountToAdd) throws SQLException {
         try {
             String getAmountsql = "SELECT amount FROM caddies WHERE id=?";
             connexion = new ConnectDB();
@@ -158,6 +158,20 @@ public class CaddiesDAO {
             close();
         } catch (SQLException e) {
             throw new SQLException();
+        }
+    }
+
+    // DELETE CaddyItems by Caddy ID
+    public void deleteCaddyItemsByCaddyId(int caddyId) throws SQLException {
+        try {
+            String sql = "DELETE FROM caddy_items WHERE caddy_id=?";
+            connexion = new ConnectDB();
+            PreparedStatement ps = connexion.getConnection().prepareStatement(sql);
+            ps.setInt(1, caddyId);
+            ps.executeUpdate();
+            close();
+        } catch (SQLException e) {
+            throw new SQLException("Erreur lors de la suppression des CaddyItems", e);
         }
     }
 

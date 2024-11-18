@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class ReponseGetCaddy implements Reponse {
     private ArrayList<CaddyItems> caddyItems;
+    double maxAmount;
 
     public ReponseGetCaddy() {
 
@@ -16,5 +17,11 @@ public class ReponseGetCaddy implements Reponse {
     }
     public void setCaddyItems(ArrayList<CaddyItems> caddyItems) {
         this.caddyItems = caddyItems;
+    }
+    public double getMaxAmount() {
+        return maxAmount;
+    }
+    public void setMaxAmount(double maxAmount) {
+        this.maxAmount = maxAmount;
     }
 }

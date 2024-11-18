@@ -1,4 +1,4 @@
-package src.Helpers;
+package Helpers;
 
 import javax.swing.*;
 

@@ -77,7 +77,7 @@ public class CaddyItemsDAO {
 
             StringBuilder sql = new StringBuilder("SELECT * FROM caddy_items ");
             ArrayList<Integer> params = new ArrayList<>();
-            sql.append(" WHERE 1=1 ");
+            sql.append(" WHERE 1=1");
             if (NumeroCaddy != -1) {
                 sql.append(" AND caddyId=?");
                 params.add(NumeroCaddy);

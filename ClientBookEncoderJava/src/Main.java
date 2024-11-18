@@ -1,8 +1,6 @@
-package src;
+import GUI.JFrame.ClientEncode;
 
-import src.GUI.JFrame.ClientEncode;
 
-;
 
 public class Main {
     public static void main(String[] args) {

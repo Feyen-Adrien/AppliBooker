@@ -1,4 +1,4 @@
-package src.Helpers;
+package Helpers;
 
 public class RequestBuilder {
 

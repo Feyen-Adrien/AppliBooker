@@ -345,17 +345,17 @@ public class ClientAchat extends JFrame {
             modele = new DefaultTableModel();
             modele.setColumnIdentifiers(colonnes);
             ListeLivres = new ArrayList<>(reponseRECHERCHER.getBooks());
-            for(int i =0;i<reponseRECHERCHER.getBooks().size();i++)
+            for(int i =0;i<ListeLivres.size();i++)
             {
                 modele.addRow(new Object[]{
-                        reponseRECHERCHER.getBooks().get(i).getNomAuteur()+ " " + reponseRECHERCHER.getBooks().get(i).getPrenomAuteur(),
-                        reponseRECHERCHER.getBooks().get(i).getNomSujet(),
-                        reponseRECHERCHER.getBooks().get(i).getTitle(),
-                        reponseRECHERCHER.getBooks().get(i).getIsbn(),
-                        reponseRECHERCHER.getBooks().get(i).getPage_count(),
-                        reponseRECHERCHER.getBooks().get(i).getStock_quantity(),
-                        reponseRECHERCHER.getBooks().get(i).getPrice(),
-                        reponseRECHERCHER.getBooks().get(i).getPublish_year()
+                        ListeLivres.get(i).getNomAuteur()+ " " + ListeLivres.get(i).getPrenomAuteur(),
+                        ListeLivres.get(i).getNomSujet(),
+                        ListeLivres.get(i).getTitle(),
+                        ListeLivres.get(i).getIsbn(),
+                        ListeLivres.get(i).getPage_count(),
+                        ListeLivres.get(i).getStock_quantity(),
+                        ListeLivres.get(i).getPrice(),
+                        ListeLivres.get(i).getPublish_year()
                 });
             }
             TableLivre.setModel(modele);
@@ -380,7 +380,7 @@ public class ClientAchat extends JFrame {
                 Book b = null;
                 for(Book book : ListeLivres)
                 {
-                    if(book.getId().equals(reponseGetCaddy.getCaddyItems().get(i).getId()))
+                    if(book.getId().equals(reponseGetCaddy.getCaddyItems().get(i).getBookId()))
                     {
                         b = book;
                     }
@@ -395,8 +395,9 @@ public class ClientAchat extends JFrame {
                         b.getPrice(),
                         reponseGetCaddy.getCaddyItems().get(i).getQuantity()
                 });
-                PanierTable.setModel(modeleCaddy);
             }
+            prixTotalTextField.setText(String.valueOf(reponseGetCaddy.getMaxAmount()));
+            PanierTable.setModel(modeleCaddy);
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -433,7 +434,7 @@ public class ClientAchat extends JFrame {
                     {
                         Succes("Article bien ajouté au caddy");
                         idCaddy = reponseADDCaddyItem.getNrCaddy();
-                        //MajCaddy();
+                        MajCaddy();
                         MajListeLivres();
                     }
                 }
@@ -441,6 +442,106 @@ public class ClientAchat extends JFrame {
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void deleteCaddyItem()
+    {
+        try {
+            if(PanierTable.getSelectedRow() ==-1)
+            {
+                Error("Veuillez selectionner un livre !");
+            }
+            else
+            {
+                CaddyItems caddyItem;
+                caddyItem = Caddyitems.get(PanierTable.getSelectedRow());
+
+                RequeteDELETE_CADDY_ITEM requeteDELETE_caddy_item = new RequeteDELETE_CADDY_ITEM(caddyItem.getId());
+                out.writeObject(requeteDELETE_caddy_item);
+                ReponseDELETE_CADDY_ITEM reponseDELETE_caddy_item;
+                reponseDELETE_caddy_item = (ReponseDELETE_CADDY_ITEM) in.readObject();
+                if(!reponseDELETE_caddy_item.getValid())
+                {
+                    Error("Erreur lors de la suppression de l'article du caddy !");
+                }
+                else
+                {
+                    Succes("Article bien supprimé au caddy");
+                    MajCaddy();
+                    MajListeLivres();
+                }
+            }
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void viderCaddy()
+    {
+        try {
+            ArrayList<CaddyItems> caddyItems = new ArrayList<>(Caddyitems);
+
+            for (CaddyItems caddyItem : caddyItems) {
+
+                RequeteDELETE_CADDY_ITEM requeteDELETE_caddy_item = new RequeteDELETE_CADDY_ITEM(caddyItem.getId());
+                out.writeObject(requeteDELETE_caddy_item);
+                ReponseDELETE_CADDY_ITEM reponseDELETE_caddy_item;
+                reponseDELETE_caddy_item = (ReponseDELETE_CADDY_ITEM) in.readObject();
+
+                if (!reponseDELETE_caddy_item.getValid()) {
+                    Error("Erreur lors de la suppression de l'article du caddy !");
+                    return;
+                }
+            }
+            Succes("Article bien supprimé au caddy");
+            MajCaddy();
+            MajListeLivres();
+
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void payed()
+    {
+        try {
+            //Flaggé comme payé
+            RequeteUPDATE_CADDY_PAYED requeteUPDATECaddyPayed = new RequeteUPDATE_CADDY_PAYED(idCaddy);
+            out.writeObject(requeteUPDATECaddyPayed);
+            ReponseUPDATE_CADDY_PAYED reponseUPDATECaddyPayed;
+            reponseUPDATECaddyPayed = (ReponseUPDATE_CADDY_PAYED) in.readObject();
+
+            if (!reponseUPDATECaddyPayed.isValide()) {
+                Error("Erreur lors du marquage du caddy comme payé !");
+                return;
+            }
+            Succes("Caddy Payé avec Succès");
+
+            //Supprimer Caddy
+            RequeteDELETE_CADDY requeteDELETECaddy = new RequeteDELETE_CADDY(idCaddy);
+            out.writeObject(requeteDELETECaddy);
+            ReponseDELETE_CADDY reponseDELETECaddy;
+            reponseDELETECaddy = (ReponseDELETE_CADDY) in.readObject();
+
+            if (!reponseDELETECaddy.isValid()) {
+                Error("Erreur lors de la suppression du caddy et des caddyItem !");
+                return;
+            }
+            Succes("Caddy Corectement supprimé");
+
+            //Logout
+            RequeteLOGOUT requeteLOGOUT = new RequeteLOGOUT(getNom());
+            out.writeObject(requeteLOGOUT);
+            Succes("Client bien déconnecté");
+
+            NrClient = -1;
+            idCaddy = -1;
+            Caddyitems.clear();
+            prixTotalTextField.setText("0");
+            disconnected();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Erreur lors du paiement : " + e.getMessage());
+        }
+
     }
 
     void Error(String m)

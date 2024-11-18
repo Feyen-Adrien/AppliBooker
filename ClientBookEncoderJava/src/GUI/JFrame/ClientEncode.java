@@ -1,11 +1,10 @@
-package src.GUI.JFrame;
+package GUI.JFrame;
 
 import GUI.JDialog.ConnexionClientEncoder;
-import src.GUI.JDialog.*;
-import src.Helpers.*;
-import src.Helpers.Entity.Author;
-import src.Helpers.Entity.Subject;
-import src.ProtocoleBSPP.*;
+import GUI.JDialog.*;
+import Helpers.*;
+import Helpers.Entity.Author;
+import Helpers.Entity.Subject;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -58,7 +57,7 @@ public class ClientEncode extends JFrame {
         setLocationRelativeTo(null);
         setMinimumSize(new Dimension(400, 150));
 
-        serverconnection = new ServerConnection("192.168.254.128", 50000);
+        serverconnection = new ServerConnection("192.168.21.129", 50000);
         bookmanager = new BookManager(serverconnection);
         authormanager = new AuthorManager(serverconnection);
         subjectmanager = new SubjectManager(serverconnection);

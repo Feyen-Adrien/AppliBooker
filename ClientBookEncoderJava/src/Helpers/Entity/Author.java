@@ -1,4 +1,4 @@
-package src.Helpers.Entity;
+package Helpers.Entity;
 
 public class Author {
     private String lastname;
