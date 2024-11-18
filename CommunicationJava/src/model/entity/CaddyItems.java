@@ -1,6 +1,8 @@
 package model.entity;
 
-public class CaddyItems {
+import java.io.Serializable;
+
+public class CaddyItems implements Serializable {
     private Integer id;
     private Integer caddyId;
     private Integer bookId;

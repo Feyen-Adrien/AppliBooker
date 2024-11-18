@@ -1,6 +1,8 @@
 package model.viewmodel;
 
-public class CaddyItemsSearchVM {
+import java.io.Serializable;
+
+public class CaddyItemsSearchVM implements Serializable {
     private Integer bookId;
     private Integer caddyId;
 

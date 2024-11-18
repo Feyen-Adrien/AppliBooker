@@ -1,6 +1,8 @@
 package model.entity;
 
-public class Author {
+import java.io.Serializable;
+
+public class Author implements Serializable {
     private Integer author_id;
     private String last_name;
     private String first_surname;

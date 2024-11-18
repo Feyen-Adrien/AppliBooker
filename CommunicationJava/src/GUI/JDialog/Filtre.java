@@ -1,8 +1,6 @@
 package GUI.JDialog;
 
-import ProtocoleBSPP.ReponseGetAuteur;
-import ProtocoleBSPP.RequeteGetAuteur;
-import model.entity.Author;
+import ProtocoleBSPP.*;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -14,9 +12,9 @@ public class Filtre extends JDialog {
     private JPanel Filtre;
     private JButton buttonOK;
     private JButton buttonAnnuler;
-    private JComboBox comboBox1;
-    private JComboBox comboBox2;
-    private JComboBox comboBox3;
+    private JComboBox<String> comboBoxAuteur;
+    private JComboBox<String> comboBoxTitre;
+    private JComboBox<String> comboBoxSujet;
     private JSpinner spinner1;
     private JPanel JValidation;
     private JPanel JChoix;
@@ -33,24 +31,65 @@ public class Filtre extends JDialog {
         setLocationRelativeTo(null);
         setSize(500,350);
 
-        RequeteGetAuteur requeteGetAuteur = new RequeteGetAuteur();
-        try {
+        // création des comboxbox
+        try
+        {
+            RequeteGetAuteur requeteGetAuteur = new RequeteGetAuteur();
             out.writeObject(requeteGetAuteur);
             ReponseGetAuteur reponseGetAuteur = new ReponseGetAuteur();
             reponseGetAuteur = (ReponseGetAuteur) in.readObject();
 
-            // parcourir le tableau recu..
+            for(int i=0;i<reponseGetAuteur.getListeAuteur().size();i++){
+                if(i==0)
+                {
+                    comboBoxAuteur.addItem(" ");
+                }
+                comboBoxAuteur.addItem(reponseGetAuteur.getListeAuteur().get(i).getLastName()+ " "+ reponseGetAuteur.getListeAuteur().get(i).getFirstSurname());
+            }
 
 
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
+        try
+        {
+            RequeteGetBooks requeteGetBooks = new RequeteGetBooks();
+            out.writeObject(requeteGetBooks);
+            ReponseGetBooks reponseGetBooks = new ReponseGetBooks();
+            reponseGetBooks = (ReponseGetBooks) in.readObject();
+
+            for (int i =0;i<reponseGetBooks.getListeLivres().size();i++) {
+                if(i==0)
+                {
+                    comboBoxTitre.addItem(" ");
+                }
+                comboBoxTitre.addItem(reponseGetBooks.getListeLivres().get(i).getTitle());
+
             }
-        });
+
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try
+        {
+            RequeteGetSubjects requeteGetSubjects = new RequeteGetSubjects();
+            out.writeObject(requeteGetSubjects);
+            ReponseGetSubjects reponseGetSubjects = new ReponseGetSubjects();
+            reponseGetSubjects = (ReponseGetSubjects) in.readObject();
+
+            for(int i = 0;i<reponseGetSubjects.getSubjects().size();i++) {
+                if(i==0)
+                {
+                    comboBoxSujet.addItem(" ");
+                }
+                comboBoxSujet.addItem(reponseGetSubjects.getSubjects().get(i).getSubject_name());
+            }
+
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
 
         buttonAnnuler.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -74,14 +113,27 @@ public class Filtre extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK() {
-        // add your code here
-        dispose();
-    }
-
     private void onCancel() {
         // add your code here if necessary
         dispose();
+    }
+
+    // setters/gettes
+    public JComboBox<String> getComboBoxSujet() {
+        return comboBoxSujet;
+    }
+    public JComboBox<String> getComboBoxAuteur() {
+        return comboBoxAuteur;
+    }
+    public JComboBox<String> getComboBoxTitre() {
+        return comboBoxTitre;
+    }
+    public JSpinner getSpinner1() {
+        return spinner1;
+    }
+
+    public JButton getButtonOK() {
+        return buttonOK;
     }
 
     public static void main(String[] args) {

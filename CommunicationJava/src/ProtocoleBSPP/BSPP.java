@@ -1,10 +1,10 @@
 package ProtocoleBSPP;
 
 import ServeurTCP.*;
-import model.dao.AuthorDAO;
-import model.dao.BookDAO;
-import model.dao.ConnectDB;
-import model.dao.SubjectDAO;
+import model.dao.*;
+import model.entity.Book;
+import model.entity.Caddies;
+import model.entity.CaddyItems;
 
 import java.net.Socket;
 import java.sql.PreparedStatement;
@@ -37,9 +37,18 @@ public class BSPP implements Protocole {
 
         if(requete instanceof RequeteINSCRIPTION) return TraiteRequeteINSCRIPTION((RequeteINSCRIPTION)requete, socket);
 
-        if(requete instanceof RequeteRECHERCHER) return TraiteRequeteRECHERCHER((RequeteRECHERCHER)requete, socket);
+        if(requete instanceof RequeteRECHERCHER) return TraiteRequeteRECHERCHER((RequeteRECHERCHER)requete);
 
         if(requete instanceof RequeteGetAuteur) return TraiteRequeteGetAuteur();
+
+        if(requete instanceof RequeteGetBooks) return TraiteRequeteGetBooks();
+
+        if(requete instanceof RequeteGetSubjects) return TraiteRequeteGetSubjects();
+
+        if(requete instanceof RequeteADD_CADDY_ITEM) return TraiteRequeteADD_CADDY_ITEM((RequeteADD_CADDY_ITEM) requete);
+
+        if(requete instanceof  RequeteGetCaddy) return  TraiteRequeteGetCaddy((RequeteGetCaddy) requete);
+
 
         return null;
     }
@@ -98,7 +107,7 @@ public class BSPP implements Protocole {
         PreparedStatement stmt, pstmt;
         ResultSet res,res2;
         int ide;
-
+        logger.Trace("Requete Inscritpion reçue de " + requete.getUserName());
         try
         {
             String sql = "SELECT name,firstname  FROM clients WHERE name = ? AND firstname = ?";
@@ -139,13 +148,23 @@ public class BSPP implements Protocole {
         }
     }
 
-    private synchronized ReponseRECHERCHER TraiteRequeteRECHERCHER(RequeteRECHERCHER requete, Socket socket)
+    private synchronized ReponseRECHERCHER TraiteRequeteRECHERCHER(RequeteRECHERCHER requete)
     {
         // filtre ici
-        AuthorDAO authorDAO;
         BookDAO bookDAO;
-        SubjectDAO subjectDAO;
-        return null;
+        ReponseRECHERCHER reponseRECHERCHER = new ReponseRECHERCHER();
+        bookDAO = BookDAO.getInstance();
+
+        logger.Trace("Requête rechercher reçue");
+
+        try {
+            reponseRECHERCHER.setBooks(bookDAO.serchBooks(requete.getBookSearchVM()));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return reponseRECHERCHER;
     }
 
     private synchronized ReponseGetAuteur TraiteRequeteGetAuteur()
@@ -156,6 +175,8 @@ public class BSPP implements Protocole {
 
         authorDAO = AuthorDAO.getInstance();
 
+        logger.Trace("Requete GetAuthors Reçue");
+
         try {
             reponseGetAuteur.setListeAuteur(authorDAO.getAllAuthors());
         } catch (SQLException e) {
@@ -164,4 +185,105 @@ public class BSPP implements Protocole {
 
         return reponseGetAuteur;
     }
+    private synchronized ReponseGetBooks TraiteRequeteGetBooks()
+    {
+        BookDAO bookDAO;
+
+        ReponseGetBooks reponseGetBooks = new ReponseGetBooks();
+
+        bookDAO = BookDAO.getInstance();
+
+        logger.Trace("Requete GetBooks reçue");
+
+        try {
+            reponseGetBooks.setListeLivres(bookDAO.getAllBooks());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return reponseGetBooks;
+    }
+    private synchronized ReponseGetSubjects TraiteRequeteGetSubjects()
+    {
+        SubjectDAO subjectDAO;
+
+        ReponseGetSubjects reponseGetSubjects = new ReponseGetSubjects();
+
+        subjectDAO = SubjectDAO.getInstance();
+
+        logger.Trace("Requête GetSubjects reçue");
+
+        try {
+            reponseGetSubjects.setSubjects(subjectDAO.getAllSubjects());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return reponseGetSubjects;
+    }
+
+    private synchronized ReponseADD_CADDY_ITEM TraiteRequeteADD_CADDY_ITEM(RequeteADD_CADDY_ITEM requete)
+    {
+        BookDAO bookDAO;
+
+        bookDAO = BookDAO.getInstance();
+
+        logger.Trace("Requete ADD_CADDY_ITEM reçue");
+
+
+        try {
+            Book book = bookDAO.getBookById(requete.getIdLivre());
+            if(book.getStock_quantity()>0)
+            {
+                CaddiesDAO caddiesDAO = CaddiesDAO.getInstance();
+                CaddyItemsDAO caddyItemsDAO = CaddyItemsDAO.getInstance();
+                Caddies caddies;
+                CaddyItems caddyItems;
+                book.setStock_quantity(book.getStock_quantity()-requete.getQuantite());
+                bookDAO.updateBook(book);
+                if(requete.isCaddyCreated()==-1)
+                {
+                    caddies = new Caddies(null,requete.getIdClient(),null,requete.getQuantite(),null);
+                    caddiesDAO.addCaddies(caddies);
+                    caddyItems = new CaddyItems(null,caddies.getCaddyId(),requete.getIdLivre(),requete.getQuantite());
+                    caddyItemsDAO.addCaddyItems(caddyItems);
+
+                    return new ReponseADD_CADDY_ITEM(caddies.getCaddyId());
+                }
+                else
+                {
+                    caddyItems = new CaddyItems(null,requete.isCaddyCreated(),requete.getIdLivre(),requete.getQuantite());
+                    caddyItemsDAO.addCaddyItems(caddyItems);
+                    return new ReponseADD_CADDY_ITEM(requete.isCaddyCreated());
+                }
+
+            }
+            else
+            {
+                return new ReponseADD_CADDY_ITEM(-2);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private synchronized ReponseGetCaddy TraiteRequeteGetCaddy(RequeteGetCaddy requete)
+    {
+        CaddyItemsDAO caddyItemsDAO;
+
+        ReponseGetCaddy reponseGetCaddy = new ReponseGetCaddy();
+
+        caddyItemsDAO = CaddyItemsDAO.getInstance();
+
+        logger.Trace("Requête GetCaddy reçue");
+
+        try {
+            reponseGetCaddy.setCaddyItems(caddyItemsDAO.getCaddyItems(requete.getNrCaddy()));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return reponseGetCaddy;
+    }
+
 }

@@ -1,6 +1,8 @@
 package model.viewmodel;
 
-public class BookSearchVM {
+import java.io.Serializable;
+
+public class BookSearchVM implements Serializable {
     private String authorName;
     private String title;
     private String subjectName;

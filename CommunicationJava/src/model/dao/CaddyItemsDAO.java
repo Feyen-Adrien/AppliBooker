@@ -70,7 +70,7 @@ public class CaddyItemsDAO {
     }
 
     //READ a LOT It depends
-    public ArrayList<CaddyItems> getCaddyItems (CaddyItemsSearchVM caddyItemsSearchVM) throws SQLException {
+    public ArrayList<CaddyItems> getCaddyItems (int NumeroCaddy) throws SQLException {
 
         try {
             ArrayList<CaddyItems> caddyItemsList = new ArrayList<>();
@@ -78,13 +78,9 @@ public class CaddyItemsDAO {
             StringBuilder sql = new StringBuilder("SELECT * FROM caddy_items ");
             ArrayList<Integer> params = new ArrayList<>();
             sql.append(" WHERE 1=1 ");
-            if (caddyItemsSearchVM.getBookId() != null) {
-                sql.append(" AND bookId=?");
-                params.add(caddyItemsSearchVM.getBookId());
-            }
-            if (caddyItemsSearchVM.getCaddyId() != null) {
+            if (NumeroCaddy != -1) {
                 sql.append(" AND caddyId=?");
-                params.add(caddyItemsSearchVM.getCaddyId());
+                params.add(NumeroCaddy);
             }
             connexion = new ConnectDB();
             PreparedStatement ps = connexion.getConnection().prepareStatement(sql.toString());

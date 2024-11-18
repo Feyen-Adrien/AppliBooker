@@ -1,6 +1,8 @@
 package model.entity;
 
-public class Subject {
+import java.io.Serializable;
+
+public class Subject implements Serializable {
     private Integer subject_id;
     private String subject_name;
 

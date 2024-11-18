@@ -1,6 +1,9 @@
 package model.entity;
+
+import java.io.Serializable;
+
 //On utilise que des Wrapper comme ça une valeur pourra être égale à null
-public class Book {
+public class Book implements Serializable {
     private Integer id;
     private Integer author_id;
     private Integer subject_id;
@@ -10,8 +13,11 @@ public class Book {
     private Integer stock_quantity;
     private Float price;
     private Integer publish_year;
+    private String nomAuteur;
+    private String prenomAuteur;
+    private String nomSujet;
 
-    public Book(Integer id, Integer author_id, Integer subject_id, String title, String isbn, Integer page_count, Integer stock_quantity, Float price, Integer publish_year) {
+    public Book(Integer id, Integer author_id, Integer subject_id, String title, String isbn, Integer page_count, Integer stock_quantity, Float price, Integer publish_year, String nomAuteur, String prenomAuteur, String nomSujet) {
         this.id = id;
         this.author_id = author_id;
         this.subject_id = subject_id;
@@ -21,6 +27,9 @@ public class Book {
         this.stock_quantity = stock_quantity;
         this.price = price;
         this.publish_year = publish_year;
+        this.nomAuteur = nomAuteur;
+        this.prenomAuteur = prenomAuteur;
+        this.nomSujet = nomSujet;
     }
 
     public Integer getId() {
@@ -93,5 +102,29 @@ public class Book {
 
     public void setPublish_year(Integer publish_year) {
         this.publish_year = publish_year;
+    }
+
+    public String getNomAuteur() {
+        return nomAuteur;
+    }
+
+    public void setNomAuteur(String nomAuteur) {
+        this.nomAuteur = nomAuteur;
+    }
+
+    public String getNomSujet() {
+        return nomSujet;
+    }
+
+    public void setNomSujet(String nomSujet) {
+        this.nomSujet = nomSujet;
+    }
+
+    public String getPrenomAuteur() {
+        return prenomAuteur;
+    }
+
+    public void setPrenomAuteur(String prenomAuteur) {
+        this.prenomAuteur = prenomAuteur;
     }
 }

@@ -68,7 +68,7 @@ public class BookDAO {
                         rs.getInt("page_count"),
                         rs.getInt("stock_quantity"),
                         rs.getFloat("price"),
-                        rs.getInt("publish_year")
+                        rs.getInt("publish_year"),null,null,null
                 ));
             }
             stmt.close();
@@ -98,7 +98,7 @@ public class BookDAO {
                         rs.getInt("page_count"),
                         rs.getInt("stock_quantity"),
                         rs.getFloat("price"),
-                        rs.getInt("publish_year")
+                        rs.getInt("publish_year"),null,null,null
                 );
             }
             close();
@@ -155,17 +155,17 @@ public class BookDAO {
             sql.append("JOIN subjects s ON b.subject_id = s.id ");
             sql.append("WHERE 1=1 ");
 
-            if (filter.getAuthorName() != null && !filter.getAuthorName().isEmpty() && !filter.getAuthorName().equals("Default")) {
+            if (filter.getAuthorName() != null && !filter.getAuthorName().isEmpty() && !filter.getAuthorName().equals(" ")) {
                 sql.append("AND a.last_name LIKE ? ");
             }
-            if (filter.getTitle() != null && !filter.getTitle().isEmpty() && !filter.getTitle().equals("Default")) {
+            if (filter.getTitle() != null && !filter.getTitle().isEmpty() && !filter.getTitle().equals(" ")) {
                 sql.append("AND b.title LIKE ? ");
             }
-            if (filter.getSubjectName() != null && !filter.getSubjectName().isEmpty() && !filter.getSubjectName().equals("Default")) {
+            if (filter.getSubjectName() != null && !filter.getSubjectName().isEmpty() && !filter.getSubjectName().equals(" ")) {
                 sql.append("AND s.name LIKE ? ");
             }
-            if (filter.getMaxPrice() != null && !filter.getMaxPrice().equals(0)) {
-                sql.append("AND b.price >= ? ");
+            if (filter.getMaxPrice() != null && !filter.getMaxPrice().equals(0f)) {
+                sql.append("AND b.price <= ? ");
             }
 
 
@@ -173,16 +173,16 @@ public class BookDAO {
             PreparedStatement ps = connexion.getConnection().prepareStatement(sql.toString());
             int i = 1;
 
-            if (filter.getAuthorName() != null && !filter.getAuthorName().isEmpty() && !filter.getAuthorName().equals("Default")) {
+            if (filter.getAuthorName() != null && !filter.getAuthorName().isEmpty() && !filter.getAuthorName().equals(" ")) {
                 ps.setString(i++, "%" + filter.getAuthorName() + "%");
             }
-            if (filter.getTitle() != null && !filter.getTitle().isEmpty() && !filter.getTitle().equals("Default")) {
+            if (filter.getTitle() != null && !filter.getTitle().isEmpty() && !filter.getTitle().equals(" ")) {
                 ps.setString(i++, "%" + filter.getTitle() + "%");
             }
-            if (filter.getSubjectName() != null && !filter.getSubjectName().isEmpty() && !filter.getSubjectName().equals("Default")) {
+            if (filter.getSubjectName() != null && !filter.getSubjectName().isEmpty() && !filter.getSubjectName().equals(" ")) {
                 ps.setString(i++, "%" + filter.getSubjectName() + "%");
             }
-            if (filter.getMaxPrice() != null && !filter.getMaxPrice().equals(0)) {
+            if (filter.getMaxPrice() != null && !filter.getMaxPrice().equals(0f)) {
                 ps.setFloat(i++, filter.getMaxPrice());
             }
 
@@ -198,7 +198,10 @@ public class BookDAO {
                         rs.getInt("page_count"),
                         rs.getInt("stock_quantity"),
                         rs.getFloat("price"),
-                        rs.getInt("publish_year")
+                        rs.getInt("publish_year"),
+                        rs.getString("last_name"),
+                        rs.getString("first_name"),
+                        rs.getString("name")
                 ));
             }
             close();

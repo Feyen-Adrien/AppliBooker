@@ -1,36 +1,20 @@
 package ProtocoleBSPP;
 
 import ServeurTCP.Requete;
+import model.viewmodel.BookSearchVM;
 
 public class RequeteRECHERCHER implements Requete{
-    String Auteur;
-    String Titre;
-    String Sujet;
-    int Prix;
+    BookSearchVM bookSearchVM;
 
+    public RequeteRECHERCHER(String auteur, String titre, String sujet , Float prix)
+    {
+        bookSearchVM = new BookSearchVM(auteur,titre,sujet,prix);
+    }
 
-    public int getPrix() {
-        return Prix;
+    public BookSearchVM getBookSearchVM() {
+        return bookSearchVM;
     }
-    public void setPrix(int prix) {
-        Prix = prix;
-    }
-    public String getAuteur() {
-        return Auteur;
-    }
-    public void setAuteur(String auteur) {
-        Auteur = auteur;
-    }
-    public String getTitre() {
-        return Titre;
-    }
-    public void setTitre(String titre) {
-        Titre = titre;
-    }
-    public String getSujet() {
-        return Sujet;
-    }
-    public void setSujet(String sujet) {
-        Sujet = sujet;
+    public void setBookSearchVM(BookSearchVM bookSearchVM) {
+        this.bookSearchVM = bookSearchVM;
     }
 }

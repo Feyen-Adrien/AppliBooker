@@ -23,7 +23,7 @@ public class TestCaddyItems {
 
             //READ Only bookID
             CaddyItemsSearchVM caddyItemsSearchVM = new CaddyItemsSearchVM(1, null);
-            ArrayList<CaddyItems> caddyItems = caddyItemsDAO.getCaddyItems(caddyItemsSearchVM);
+            ArrayList<CaddyItems> caddyItems = caddyItemsDAO.getCaddyItems(1);
 
             if (!caddyItems.isEmpty()) {
                 System.out.println("\n\nResult of the GET BY BookId : \n");
@@ -40,7 +40,7 @@ public class TestCaddyItems {
 
             //READ Only caddyID
             caddyItemsSearchVM = new CaddyItemsSearchVM(null, 1);
-            caddyItems = caddyItemsDAO.getCaddyItems(caddyItemsSearchVM);
+            caddyItems = caddyItemsDAO.getCaddyItems(1);
 
             if (!caddyItems.isEmpty()) {
                 System.out.println("\n\nResult of the GET BY CaddyId : \n");
@@ -57,7 +57,7 @@ public class TestCaddyItems {
 
             //READ The TWO
             caddyItemsSearchVM = new CaddyItemsSearchVM(1, 1);
-            caddyItems = caddyItemsDAO.getCaddyItems(caddyItemsSearchVM);
+            caddyItems = caddyItemsDAO.getCaddyItems(1);
 
             if (!caddyItems.isEmpty()) {
                 System.out.println("\n\nResult of the GET BY BookId & CaddyId : \n");

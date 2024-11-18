@@ -1,7 +1,6 @@
 package model.tests;
 
 import model.dao.BookDAO;
-import model.dao.ConnectDB;
 import model.entity.Book;
 import model.viewmodel.BookSearchVM;
 
@@ -14,14 +13,14 @@ public class TestBooks {
             BookDAO bookDAO = BookDAO.getInstance();
 
             //CREATE
-            Book newBook = new Book(null, 1, 2, "Agenda", "1234567891", 1200, 5, 99.99f, 2024);
+            Book newBook = new Book(null, 1, 2, "Agenda", "1234567891", 1200, 5, 99.99f, 2024,null,null,null);
             bookDAO.addBook(newBook);
 
             int bookId = newBook.getId();
             System.out.println("Ajout Sucess Id Livre = " + bookId);
 
             //Search for One book spécific
-            BookSearchVM searchVMFilter = new BookSearchVM("Werber", "Les Fourmis", "Science-Fiction", 0f);
+            BookSearchVM searchVMFilter = new BookSearchVM("Werber", "Les Fourmis", "Science-Fiction", 2f);
             ArrayList<Book> booksFound = bookDAO.serchBooks(searchVMFilter);
 
             if (!booksFound.isEmpty()) {
@@ -36,7 +35,9 @@ public class TestBooks {
                             "\nPage Count : " + book.getPage_count() +
                             "\nStock Quantity : " + book.getStock_quantity() +
                             "\nPrice : " + book.getPrice() +
-                            "\nPublish Year : " + book.getPublish_year());
+                            "\nPublish Year : " + book.getPublish_year()+
+                            "\nNomAuteur : " + book.getNomAuteur()+ " " +book.getPrenomAuteur()+
+                            "\nSujet : " + book.getNomSujet());
                 }
             } else {
                 System.out.println("No books found");
@@ -44,7 +45,7 @@ public class TestBooks {
 
 
             //Search for A Lot of Book Different
-            searchVMFilter = new BookSearchVM("Werber", "Default", "Default", 0f);
+            searchVMFilter = new BookSearchVM("Werber", "Default", "Default", 2f);
             booksFound = bookDAO.serchBooks(searchVMFilter);
 
             if (!booksFound.isEmpty()) {
@@ -106,7 +107,7 @@ public class TestBooks {
             }
 
             //UPDATE
-            Book updateBook = new Book(bookId, 1, 2, "Alinea", "4567891235", 2500, 3, 99.99f, 2024);
+            Book updateBook = new Book(bookId, 1, 2, "Alinea", "4567891235", 2500, 3, 99.99f, 2024,null,null,null);
             bookDAO.updateBook(updateBook);
 
             //GET ONEBOOK
