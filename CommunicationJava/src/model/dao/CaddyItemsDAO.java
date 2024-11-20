@@ -161,7 +161,6 @@ public class CaddyItemsDAO {
         }
     }
 
-
     //DELETE
     public void deleteCaddyItems (int id) throws SQLException {
         try {

@@ -6,9 +6,9 @@ public class BookSearchVM implements Serializable {
     private String authorName;
     private String title;
     private String subjectName;
-    private Float maxPrice;
+    private double maxPrice;
 
-    public BookSearchVM(String authorName, String title, String subjectName, Float maxPrice) {
+    public BookSearchVM(String authorName, String title, String subjectName, double maxPrice) {
         this.authorName = authorName;
         this.title = title;
         this.subjectName = subjectName;
@@ -27,7 +27,7 @@ public class BookSearchVM implements Serializable {
         return subjectName;
     }
 
-    public Float getMaxPrice() {
+    public double getMaxPrice() {
         return maxPrice;
     }
 
@@ -43,7 +43,7 @@ public class BookSearchVM implements Serializable {
         this.subjectName = subjectName;
     }
 
-    public void setMaxPrice(Float maxPrice) {
+    public void setMaxPrice(double maxPrice) {
         this.maxPrice = maxPrice;
     }
 }

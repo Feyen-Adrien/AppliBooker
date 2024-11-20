@@ -10,6 +10,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -27,7 +29,7 @@ public class ClientAchat extends JFrame {
     private String Auteur = " ";
     private String Titre = " ";
     private String Sujet =" ";
-    private int Prix = 0;
+    private double Prix = 0.0;
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private JButton rechercherButton;
@@ -51,10 +53,11 @@ public class ClientAchat extends JFrame {
     private JToolBar clientToolBar;
     private JTable PanierTable;
     private JTable TableLivre;
-    private final JPopupMenu popupMenu;
-    private final JMenuItem itemConnexion;
-    private final JMenuItem itemInscription;
-    private final JMenuItem itemDeconnexion;
+    private JButton resetButton;
+    private JPopupMenu popupMenu;
+    private JMenuItem itemConnexion;
+    private JMenuItem itemInscription;
+    private JMenuItem itemDeconnexion;
     private JInscription inscription;
     private ConnexionClient connexion;
     private DefaultTableModel modele;
@@ -70,43 +73,15 @@ public class ClientAchat extends JFrame {
         setSize(1050, 650);
         setLocationRelativeTo(null);
 
-        // Ajout du nom des colonnes à la liste et au pnier
-        /*
-        modele = new DefaultTableModel(null,new String[]{"Titre", "Auteur", "Quantité","Prix"});
-        PanierTable.setModel(modele);*/
+        // Configuration du Menu
+        JPopMenuConfiguration();
 
-
-        // configuration du JPopupMenu
-        popupMenu = new JPopupMenu();
-
-        itemConnexion = new JMenuItem("Connexion");
-        itemInscription = new JMenuItem("Inscription");
-        itemDeconnexion = new JMenuItem("Deconnexion");
-        popupMenu.add(itemConnexion);
-        popupMenu.add(itemInscription);
-        popupMenu.add(itemDeconnexion);
-
-        // permet de colorer en bleu l'item du menu quand la souris est dessus
-        MouseAdapter mouseAdapter = new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                JMenuItem source = (JMenuItem) e.getSource();
-                source.setBackground(new Color(255, 255, 255));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                JMenuItem source = (JMenuItem) e.getSource();
-                source.setBackground(UIManager.getColor("MenuItem.background"));
-            }
-        };
-        // ajout du listener aux bouttons
-        itemDeconnexion.addMouseListener(mouseAdapter);
-        itemInscription.addMouseListener(mouseAdapter);
-        itemConnexion.addMouseListener(mouseAdapter);
-
-
-        // ajout d'action aux buttons du Jpopupmenu
+        // Apparait déconnecté
+        disconnected();
+        //Configuration des bouttons pour le client
+        // Menu affichage
+        menuButton.addActionListener(e -> popupMenu.show(this,33,56));
+        // Inscription
         itemInscription.addActionListener(e1 -> {
             inscription  = new JInscription();
             inscription.getButtonInscription().addActionListener(e3->{
@@ -136,7 +111,7 @@ public class ClientAchat extends JFrame {
                                 Succes("Inscription réussie ! Numéro client = " + NrClient);
                                 inscription.dispose();
                                 connected(); // active les bouttons
-                                MajListeLivres();
+                                majListeLivres();
                             }
                             else
                             {
@@ -151,7 +126,7 @@ public class ClientAchat extends JFrame {
             });
             inscription.setVisible(true);
         });
-        // permet d'afficher une Jdialog pour l'inscription
+        // Connexion
         itemConnexion.addActionListener(e1 -> {
             try {
                 connexion = new ConnexionClient();
@@ -182,7 +157,7 @@ public class ClientAchat extends JFrame {
                                     Succes("Connexion réussi ! Numéro de client = " + NrClient);
                                     connexion.dispose();
                                     connected(); // active les bouttons
-                                    MajListeLivres();
+                                    majListeLivres();
                                 }
                                 else
                                 {
@@ -201,30 +176,24 @@ public class ClientAchat extends JFrame {
                 throw new RuntimeException(e);
             }
         });
-        // permet d'afficher une JDialog pour l connexion
+        // Deconnexion
         itemDeconnexion.addActionListener(e1 -> {
-            RequeteLOGOUT requete = new RequeteLOGOUT(getNom());
-            try {
-                out.writeObject(requete);
-                Succes("Client bien déconnecté");
-                NrClient = -1;
-                disconnected();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if(idCaddy != -1)
+            {
+                viderCaddy();
+                annulerCaddy();
             }
-            // vider panier si rempli ...
-        });// permet de deconnecter l'utilisateur
-
-
-        // Désactiver tous les boutons
-        disconnected();
-
-        // Button Ajouter Element Caddy
-        ajouterButton.addActionListener(e->{
-            AjouterCaddy();
+            disconnected();
         });
-
-        // affichage du filtre
+        // Reset
+        resetButton.addActionListener(e -> {
+            Auteur = " ";
+            Titre = " ";
+            Sujet = " ";
+            Prix = 0.0;
+            majListeLivres();
+        });
+        // Filtre
         filtreButton.addActionListener(e -> {
             Filtre filtre = new Filtre(in,out);
             filtre.getComboBoxAuteur().setSelectedItem(Auteur);
@@ -235,19 +204,67 @@ public class ClientAchat extends JFrame {
                 Auteur = filtre.getComboBoxAuteur().getSelectedItem().toString();
                 Titre = filtre.getComboBoxTitre().getSelectedItem().toString();
                 Sujet = filtre.getComboBoxSujet().getSelectedItem().toString();
-                Prix = (int)filtre.getSpinner1().getValue();
+                Prix = (double)filtre.getSpinner1().getValue();
 
                 filtre.dispose();
             });
             filtre.setVisible(true);
         });
+        // Rechercher
         rechercherButton.addActionListener(e -> {
-            MajListeLivres();
+            majListeLivres();
+        });
+        // Ajouter
+        ajouterButton.addActionListener(e->{
+            ajouterCaddyItem();
+        });
+        // Supprimer
+        supprimerButton.addActionListener(e -> {
+            supprimerCaddyItem();
+        });
+        // Vider Caddy
+        viderLePanierButton.addActionListener(e -> {
+            if(idCaddy != -1)
+            {
+                viderCaddy();
+            }
+        });
+        // Payement caddy
+        payerButton.addActionListener(e -> {
+           payed();
+           disconnected();
+        });
+        // Annulation
+        annulerButton.addActionListener(e -> {
+            if(idCaddy != -1)
+            {
+                viderCaddy();
+                annulerCaddy();
+            }
+            disconnected();
+        });
+        // Annulation commande quand clique sur croix
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if(NrClient != -1)
+                {
+                    if(idCaddy != -1)
+                    {
+                        viderCaddy();
+                        annulerCaddy();
+                    }
+                    dispose();
+                }
+                else
+                {
+                    dispose();
+                }
+
+            }
         });
 
-        // affichage menu déroulant
-        menuButton.addActionListener(e -> popupMenu.show(this,33,56));
-    }
+    }// encore à améliorer !!!!
     // METHODE SPECIFIQUES
     public void connexionServeur()
     {
@@ -273,7 +290,6 @@ public class ClientAchat extends JFrame {
             socket = new Socket(ipServer,Integer.parseInt(PORT_PAYEMENT));
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
-
         }
         catch (Exception e)
         {
@@ -281,10 +297,31 @@ public class ClientAchat extends JFrame {
             dialog.setVisible(true);
         }
     }
-
     public void deconnexionServeur()
     {
         try {
+            if(NrClient != -1)
+            {
+                //Logout
+                RequeteLOGOUT requeteLOGOUT = new RequeteLOGOUT(getNom());
+                out.writeObject(requeteLOGOUT);
+                Succes("Client bien déconnecté");
+                NrClient = -1;
+                idCaddy = -1;
+                Auteur = " ";
+                Titre = " ";
+                Sujet = " ";
+                Prix = 0.0;
+                modele = new DefaultTableModel();
+                if(Caddyitems != null)
+                {
+                    Caddyitems.clear();
+                    PanierTable.setModel(modele);
+                }
+                ListeLivres.clear();
+                TableLivre.setModel(modele);
+                prixTotalTextField.setText("0.0");
+            }
             socket.close();
             out.close();
             in.close();
@@ -292,10 +329,9 @@ public class ClientAchat extends JFrame {
             throw new RuntimeException(e);
         }
     }
-
-
     public void connected()
     {
+        resetButton.setEnabled(true);
         filtreButton.setEnabled(true);
         rechercherButton.setEnabled(true);
         ajouterButton.setEnabled(true);
@@ -310,6 +346,7 @@ public class ClientAchat extends JFrame {
     }
     public void disconnected()
     {
+        resetButton.setEnabled(false);
         filtreButton.setEnabled(false);
         rechercherButton.setEnabled(false);
         ajouterButton.setEnabled(false);
@@ -321,10 +358,43 @@ public class ClientAchat extends JFrame {
         itemDeconnexion.setEnabled(false);
         itemConnexion.setEnabled(true);
         itemInscription.setEnabled(true);
-
+        if(NrClient != -1)
+        {
+            deconnexionServeur();
+        }
     }
+    public void JPopMenuConfiguration()
+    {
+        // configuration du JPopupMenu
+        popupMenu = new JPopupMenu();
 
-    public void MajListeLivres()
+        itemConnexion = new JMenuItem("Connexion");
+        itemInscription = new JMenuItem("Inscription");
+        itemDeconnexion = new JMenuItem("Deconnexion");
+        popupMenu.add(itemConnexion);
+        popupMenu.add(itemInscription);
+        popupMenu.add(itemDeconnexion);
+
+        // permet de colorer en bleu l'item du menu quand la souris est dessus
+        MouseAdapter mouseAdapter = new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                JMenuItem source = (JMenuItem) e.getSource();
+                source.setBackground(new Color(255, 255, 255));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                JMenuItem source = (JMenuItem) e.getSource();
+                source.setBackground(UIManager.getColor("MenuItem.background"));
+            }
+        };
+        // ajout du listener aux bouttons
+        itemDeconnexion.addMouseListener(mouseAdapter);
+        itemInscription.addMouseListener(mouseAdapter);
+        itemConnexion.addMouseListener(mouseAdapter);
+    }
+    public void majListeLivres()
     {
         try
         {
@@ -337,12 +407,18 @@ public class ClientAchat extends JFrame {
                 String[] part = getAuteur().split(" ");
                 nomAuteur= part[0];
             }
-            RequeteRECHERCHER requeteRECHERCHER = new RequeteRECHERCHER(nomAuteur,getTitre(),getSujet(),((Integer)Prix).floatValue());
+            RequeteRECHERCHER requeteRECHERCHER = new RequeteRECHERCHER(nomAuteur,getTitre(),getSujet(),getPrix());
             out.writeObject(requeteRECHERCHER);
             ReponseRECHERCHER reponseRECHERCHER;
             reponseRECHERCHER = (ReponseRECHERCHER) in.readObject();
             String[] colonnes = {"Auteur", "Sujet", "Titre","ISBN","Page","Stock","Prix","Année de publication"};
-            modele = new DefaultTableModel();
+            modele = new DefaultTableModel()
+            {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
             modele.setColumnIdentifiers(colonnes);
             ListeLivres = new ArrayList<>(reponseRECHERCHER.getBooks());
             for(int i =0;i<ListeLivres.size();i++)
@@ -364,7 +440,7 @@ public class ClientAchat extends JFrame {
         }
 
     }
-    public void MajCaddy()
+    public void majCaddy()
     {
         try {
             RequeteGetCaddy requeteGetCaddy = new RequeteGetCaddy(idCaddy);
@@ -372,7 +448,13 @@ public class ClientAchat extends JFrame {
             ReponseGetCaddy reponseGetCaddy;
             reponseGetCaddy = (ReponseGetCaddy) in.readObject();
             String[] colonnes = {"Auteur","Titre","Prix","Quantité"};
-            modeleCaddy = new DefaultTableModel();
+            modeleCaddy = new DefaultTableModel()
+            {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
             modeleCaddy.setColumnIdentifiers(colonnes);
             Caddyitems = new ArrayList<>(reponseGetCaddy.getCaddyItems());
             for(int i =0;i<reponseGetCaddy.getCaddyItems().size();i++)
@@ -403,13 +485,13 @@ public class ClientAchat extends JFrame {
         }
 
     }
-    public void AjouterCaddy()
+    public void ajouterCaddyItem()
     {
         try {
             int qte = (int)quantiteSpinner.getValue();
             if(qte <= 0)
             {
-                Error("Veuillez choisir une quatité");
+                Error("Veuillez choisir une quantité");
             }
             else
             {
@@ -434,8 +516,8 @@ public class ClientAchat extends JFrame {
                     {
                         Succes("Article bien ajouté au caddy");
                         idCaddy = reponseADDCaddyItem.getNrCaddy();
-                        MajCaddy();
-                        MajListeLivres();
+                        majCaddy();
+                        majListeLivres();
                     }
                 }
             }
@@ -443,8 +525,7 @@ public class ClientAchat extends JFrame {
             throw new RuntimeException(e);
         }
     }
-
-    public void deleteCaddyItem()
+    public void supprimerCaddyItem()
     {
         try {
             if(PanierTable.getSelectedRow() ==-1)
@@ -466,9 +547,9 @@ public class ClientAchat extends JFrame {
                 }
                 else
                 {
-                    Succes("Article bien supprimé au caddy");
-                    MajCaddy();
-                    MajListeLivres();
+                    Succes("Article bien supprimé du caddy");
+                    majCaddy();
+                    majListeLivres();
                 }
             }
         } catch (ClassNotFoundException | IOException e) {
@@ -488,19 +569,20 @@ public class ClientAchat extends JFrame {
                 reponseDELETE_caddy_item = (ReponseDELETE_CADDY_ITEM) in.readObject();
 
                 if (!reponseDELETE_caddy_item.getValid()) {
-                    Error("Erreur lors de la suppression de l'article du caddy !");
-                    return;
+                    Error("Erreur lors de la suppression des articles du caddy !");
+                    return ;
                 }
             }
-            Succes("Article bien supprimé au caddy");
-            MajCaddy();
-            MajListeLivres();
+            Succes("Articles bien supprimés du caddy");
+            majCaddy();
+            majListeLivres();
 
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
-    }
 
+
+    }
     public void payed()
     {
         try {
@@ -516,7 +598,16 @@ public class ClientAchat extends JFrame {
             }
             Succes("Caddy Payé avec Succès");
 
-            //Supprimer Caddy
+            disconnected();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Erreur lors du paiement : " + e.getMessage());
+        }
+
+    }
+    void annulerCaddy()
+    {
+        try
+        {
             RequeteDELETE_CADDY requeteDELETECaddy = new RequeteDELETE_CADDY(idCaddy);
             out.writeObject(requeteDELETECaddy);
             ReponseDELETE_CADDY reponseDELETECaddy;
@@ -528,32 +619,22 @@ public class ClientAchat extends JFrame {
             }
             Succes("Caddy Corectement supprimé");
 
-            //Logout
-            RequeteLOGOUT requeteLOGOUT = new RequeteLOGOUT(getNom());
-            out.writeObject(requeteLOGOUT);
-            Succes("Client bien déconnecté");
-
-            NrClient = -1;
-            idCaddy = -1;
-            Caddyitems.clear();
-            prixTotalTextField.setText("0");
-            disconnected();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Erreur lors du paiement : " + e.getMessage());
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
         }
-
     }
-
     void Error(String m)
     {
         ErrorDialog dialog = new ErrorDialog(m);
         dialog.pack();
+        dialog.setTitle("Erreur");
         dialog.setVisible(true);
     }
     void Succes(String m)
     {
         ValidDialog dialog = new ValidDialog(m);
         dialog.pack();
+        dialog.setTitle("Succes");
         dialog.setVisible(true);
     }
 
@@ -601,11 +682,11 @@ public class ClientAchat extends JFrame {
         Sujet = sujet;
     }
 
-    public int getPrix() {
+    public double getPrix() {
         return Prix;
     }
 
-    public void setPrix(int prix) {
+    public void setPrix(double prix) {
         Prix = prix;
     }
 

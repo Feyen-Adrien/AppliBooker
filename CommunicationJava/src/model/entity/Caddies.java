@@ -6,10 +6,10 @@ public class Caddies implements Serializable {
     private Integer id;
     private Integer caddyId;
     private String date;
-    private Integer amount;
+    private double amount;
     private Boolean payed;
 
-    public Caddies(Integer id, Integer caddyId, String date, Integer amount, Boolean payed) {
+    public Caddies(Integer id, Integer caddyId, String date, double amount, Boolean payed) {
         this.id = id;
         this.caddyId = caddyId;
         this.date = date;
@@ -29,7 +29,7 @@ public class Caddies implements Serializable {
         return date;
     }
 
-    public Integer getAmount() {
+    public double getAmount() {
         return amount;
     }
 
@@ -49,7 +49,7 @@ public class Caddies implements Serializable {
         this.date = date;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 

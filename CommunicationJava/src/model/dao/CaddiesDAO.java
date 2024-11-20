@@ -69,7 +69,7 @@ public class CaddiesDAO {
                         rs.getInt("id"),
                         rs.getInt("clientId"),
                         rs.getString("date"),
-                        rs.getInt("amount"),
+                        rs.getDouble("amount"),
                         rs.getBoolean("payed")
                 );
             }
@@ -114,16 +114,16 @@ public class CaddiesDAO {
             getAmountps.setInt(1, id);
             ResultSet rs = getAmountps.executeQuery();
 
-            int currentAmount = 0;
+            float currentAmount = 0.0f;
             if (rs.next()) {
-                currentAmount = rs.getInt("amount");
+                currentAmount = rs.getFloat("amount");
             }
 
             currentAmount += amountToAdd;
 
             String sql = "UPDATE caddies SET amount=? WHERE id=?";
             PreparedStatement ps = connexion.getConnection().prepareStatement(sql);
-            ps.setInt(1, currentAmount);
+            ps.setDouble(1, currentAmount);
             ps.setInt(2, id);
             ps.executeUpdate();
             close();

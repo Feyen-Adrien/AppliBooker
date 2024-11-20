@@ -31,6 +31,9 @@ public class Filtre extends JDialog {
         setLocationRelativeTo(null);
         setSize(500,350);
 
+        SpinnerNumberModel mod = new SpinnerNumberModel(0.0,0,10000,0.01);
+        spinner1.setModel(mod);
+
         // création des comboxbox
         try
         {
@@ -38,6 +41,8 @@ public class Filtre extends JDialog {
             out.writeObject(requeteGetAuteur);
             ReponseGetAuteur reponseGetAuteur = new ReponseGetAuteur();
             reponseGetAuteur = (ReponseGetAuteur) in.readObject();
+
+
 
             for(int i=0;i<reponseGetAuteur.getListeAuteur().size();i++){
                 if(i==0)

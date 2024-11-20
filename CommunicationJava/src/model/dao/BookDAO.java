@@ -164,7 +164,7 @@ public class BookDAO {
             if (filter.getSubjectName() != null && !filter.getSubjectName().isEmpty() && !filter.getSubjectName().equals(" ")) {
                 sql.append("AND s.name LIKE ? ");
             }
-            if (filter.getMaxPrice() != null && !filter.getMaxPrice().equals(0f)) {
+            if (filter.getMaxPrice() > 0.0 ) {
                 sql.append("AND b.price <= ? ");
             }
 
@@ -182,8 +182,8 @@ public class BookDAO {
             if (filter.getSubjectName() != null && !filter.getSubjectName().isEmpty() && !filter.getSubjectName().equals(" ")) {
                 ps.setString(i++, "%" + filter.getSubjectName() + "%");
             }
-            if (filter.getMaxPrice() != null && !filter.getMaxPrice().equals(0f)) {
-                ps.setFloat(i++, filter.getMaxPrice());
+            if (filter.getMaxPrice() > 0.0 ) {
+                ps.setDouble(i++, filter.getMaxPrice());
             }
 
             ResultSet rs = ps.executeQuery();

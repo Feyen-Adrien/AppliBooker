@@ -244,8 +244,10 @@ public class BSPP implements Protocole {
                 CaddyItemsDAO caddyItemsDAO = CaddyItemsDAO.getInstance();
                 Caddies caddies;
                 CaddyItems caddyItems;
+                // MAJ livre
                 book.setStock_quantity(book.getStock_quantity()-requete.getQuantite());
                 bookDAO.updateBook(book);
+                // Ajout dans caddy + creation caddy si inexistant
                 if(requete.isCaddyCreated()==-1)
                 {
                     caddies = new Caddies(null,requete.getIdClient(),null,0,null);
@@ -261,7 +263,7 @@ public class BSPP implements Protocole {
                 {
                     caddyItems = new CaddyItems(null,requete.isCaddyCreated(),requete.getIdLivre(),requete.getQuantite());
                     caddyItemsDAO.addCaddyItems(caddyItems);
-                    caddiesDAO.updateCaddiesAmount(requete.isCaddyCreated(), book.getPrice()*book.getStock_quantity());
+                    caddiesDAO.updateCaddiesAmount(requete.isCaddyCreated(), book.getPrice()*requete.getQuantite());
                     return new ReponseADD_CADDY_ITEM(requete.isCaddyCreated());
                 }
 
@@ -301,11 +303,22 @@ public class BSPP implements Protocole {
     private synchronized ReponseDELETE_CADDY_ITEM TraiteRequeteDeleteCaddyItem(RequeteDELETE_CADDY_ITEM requete)
     {
         CaddyItemsDAO caddyItemsDAO = CaddyItemsDAO.getInstance();
+        CaddiesDAO caddiesDAO = CaddiesDAO.getInstance();
+        BookDAO bookDAO = BookDAO.getInstance();
         ReponseDELETE_CADDY_ITEM reponseDELETECaddyItem = new ReponseDELETE_CADDY_ITEM();
 
         logger.Trace("Requête DeleteCaddyItem reçue");
         try {
-            caddyItemsDAO.deleteCaddyItems(requete.getIdLivre());
+            // misa à jour du livre
+            CaddyItems caddyItems = caddyItemsDAO.getCaddyItemsbyId(requete.getIdItemCaddy());
+            Book book = bookDAO.getBookById(caddyItems.getBookId());
+            book.setStock_quantity(book.getStock_quantity()+caddyItems.getQuantity());
+            bookDAO.updateBook(book);
+            //Mise à jour caddy items
+            caddyItemsDAO.deleteCaddyItems(caddyItems.getId());
+            // Mise à jour caddy
+            float montantARetirer = (caddyItems.getQuantity()*book.getPrice())*-1;
+            caddiesDAO.updateCaddiesAmount(caddyItems.getCaddyId(), montantARetirer);
             reponseDELETECaddyItem.setValid(true);
         } catch (SQLException e) {
             logger.Trace("Error lors du delete caddyItem : " + e.getMessage());
@@ -339,7 +352,6 @@ public class BSPP implements Protocole {
         logger.Trace("Requête DeleteCaddy reçue");
         try
         {
-            caddiesDAO.deleteCaddyItemsByCaddyId(requete.getIdCaddy());
             caddiesDAO.deleteCaddies(requete.getIdCaddy());
             reponseDELETECaddy.setValid(true);
         } catch (SQLException e) {

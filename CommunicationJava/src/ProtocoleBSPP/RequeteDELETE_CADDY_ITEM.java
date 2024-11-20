@@ -3,17 +3,19 @@ package ProtocoleBSPP;
 import ServeurTCP.Requete;
 
 public class RequeteDELETE_CADDY_ITEM implements Requete {
-    int idLivre;
+    int idItemCaddy;
+
 
     public RequeteDELETE_CADDY_ITEM(int idLivre) {
-        this.idLivre = idLivre;
+        this.idItemCaddy = idLivre;
     }
 
-    public int getIdLivre() {
-        return idLivre;
+    public int getIdItemCaddy() {
+        return idItemCaddy;
     }
 
-    public void setIdLivre(int idLivre) {
-        this.idLivre = idLivre;
+    public void setIdItemCaddy(int idLivre) {
+        this.idItemCaddy = idLivre;
     }
+
 }

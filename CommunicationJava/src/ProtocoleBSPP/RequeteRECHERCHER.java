@@ -6,7 +6,7 @@ import model.viewmodel.BookSearchVM;
 public class RequeteRECHERCHER implements Requete{
     BookSearchVM bookSearchVM;
 
-    public RequeteRECHERCHER(String auteur, String titre, String sujet , Float prix)
+    public RequeteRECHERCHER(String auteur, String titre, String sujet , double prix)
     {
         bookSearchVM = new BookSearchVM(auteur,titre,sujet,prix);
     }
