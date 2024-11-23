@@ -5,7 +5,12 @@ import GUI.JDialog.*;
 import Helpers.*;
 import Helpers.Entity.Author;
 import Helpers.Entity.Subject;
+import Helpers.Managers.AuthorManager;
+import Helpers.Managers.BookManager;
+import Helpers.Managers.ConnexionManager;
+import Helpers.Managers.SubjectManager;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -96,9 +101,9 @@ public class ClientEncode extends JFrame {
                 connexion.getButtonConnexion().addActionListener(e2 ->{
 
                     if (connexion.getLogin().isEmpty()) {
-                        JOptionPane.showMessageDialog(ClientEncode.this, "Veuillez encoder un Login.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        Error("Veuillez encoder un Login.");
                     } else if (connexion.getPassword().isEmpty()) {
-                        JOptionPane.showMessageDialog(ClientEncode.this, "Veuillez encoder un Password", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        Error("Veuillez encoder un Password.");
                     } else {
                         String[] element;
                         element = connexionManager.Login(connexion.getLogin(), connexion.getPassword());
@@ -109,11 +114,14 @@ public class ClientEncode extends JFrame {
                             connect();
                             try {
                                 LoadData();
+                                Utils.PlayMusic(4);
                             } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            } catch (UnsupportedAudioFileException e) {
                                 throw new RuntimeException(e);
                             }
                         } else if (element[1].equals("ko")) {
-                            JOptionPane.showMessageDialog(ClientEncode.this, element[2], "Erreur", JOptionPane.ERROR_MESSAGE);
+                            Error(element[2]);
                         }
                     }
                 });
@@ -144,7 +152,12 @@ public class ClientEncode extends JFrame {
 
         table1.setModel(tableModel);
 
-        spPrix.setModel(new SpinnerNumberModel(0.0, 0.0, 10000.0, 0.1));
+        //Dans ces modèle de spinner on peut réduire leurs tailles
+        spPages.setModel(new SpinnerNumberModel(0, 0, 10000, 1));
+        spPrix.setModel(new SpinnerNumberModel(0.0, 0.0, 1000.0, 0.1));
+        spAnnepubli.setModel(new SpinnerNumberModel(1980, 1900, 2021, 1));
+        spStock.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
+
 
 
         //Vide tout les champs
@@ -160,11 +173,24 @@ public class ClientEncode extends JFrame {
            @Override
            public void actionPerformed(ActionEvent e) {
                if (!txtTitle.getText().isEmpty() && !txtISBN.getText().isEmpty()) {
+                   if (!Utils.checkISBN(txtISBN.getText())) {
+                       Error("L'ISBN doit contenir 10 chiffres.");
+                       return;
+                   }
                    int id = bookmanager.addBook(txtTitle.getText(), txtISBN.getText(), (int) spPages.getValue(), (double) spPrix.getValue(), (int) spAnnepubli.getValue(), (int) spStock.getValue(), (String) cbAuteur.getSelectedItem(), (String) cbSujet.getSelectedItem());
                    Object[] row = {id, txtTitle.getText(), cbAuteur.getSelectedItem(), cbSujet.getSelectedItem(), txtISBN.getText(), spPages.getValue(), spAnnepubli.getValue(), spPrix.getValue(), spStock.getValue()};
                    tableModel.insertRow(0, row);
+
+                   try {
+                       Utils.PlayMusic(0);
+                   } catch (IOException ex) {
+                       throw new RuntimeException(ex);
+                   } catch (UnsupportedAudioFileException ex) {
+                       throw new RuntimeException(ex);
+                   }
+
                } else {
-                   JOptionPane.showMessageDialog(ClientEncode.this, "Le titre et l'ISBN sont obligatoires.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                   Error("Le titre et l'ISBN sont obligatoires.");
                }
            }
         });
@@ -194,6 +220,13 @@ public class ClientEncode extends JFrame {
                     subjectmanager.addSubject(newSubject.getSubject());
                     cbSujet.addItem(newSubject.getSubject());
                 }
+            }
+        });
+
+        panel1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Click();
             }
         });
 
@@ -258,9 +291,38 @@ public class ClientEncode extends JFrame {
         Utils.ViderLesChamps(txtTitle, txtISBN, spPages, spPrix, spAnnepubli, spStock);
         disconnected();
 
+        try {
+            Utils.PlayMusic(5);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        }
+
         for (int i=0; tableModel.getRowCount()>0; i++) {
             tableModel.removeRow(i);
         }
+    }
+
+    private void Click() {
+        try {
+            Utils.PlayMusic(3);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void Error(String message) {
+        try {
+            Utils.PlayMusic(1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        }
+        JOptionPane.showMessageDialog(ClientEncode.this, message, "Erreur", JOptionPane.ERROR_MESSAGE);
     }
 
     public static void main(String[] args) {

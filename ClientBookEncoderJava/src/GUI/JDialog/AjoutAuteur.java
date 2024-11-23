@@ -1,6 +1,7 @@
 package GUI.JDialog;
 
 import Helpers.Entity.Author;
+import Helpers.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,6 +49,15 @@ public class AjoutAuteur extends JDialog {
     }
 
     private void onOK() {
+        if (textFieldFirstName.getText().isEmpty() || textFieldLastName.getText().isEmpty() || textFieldDate.getText().isEmpty() || textFieldDate.getText().length() != 10) {
+            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if(!Utils.checkDate(textFieldDate.getText())) {
+            JOptionPane.showMessageDialog(this, "Veuillez entrer une date valide", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         author = new Author(textFieldFirstName.getText(), textFieldLastName.getText(), textFieldDate.getText());
         dispose();
     }
