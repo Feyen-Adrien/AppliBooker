@@ -84,19 +84,19 @@ public class Utils {
     public static void PlayMusic(int i) throws IOException, UnsupportedAudioFileException {
             String path = "";
             if (i == 0) {
-                path = "AppliBooker/ClientBookEncoderJava/Music/AddSong.wav";
+                path = "ClientBookEncoderJava/Music/AddSong.wav";
             } else if (i == 1) {
-                path = "AppliBooker/ClientBookEncoderJava/Music/ErrorSong.wav";
+                path = "ClientBookEncoderJava/Music/ErrorSong.wav";
             } else if (i == 2) {
-                path = "AppliBooker/ClientBookEncoderJava/Music/Logout.wav";
+                path = "ClientBookEncoderJava/Music/Logout.wav";
             } else if (i == 3) {
-                path = "AppliBooker/ClientBookEncoderJava/Music/ClickSong.wav";
+                path = "ClientBookEncoderJava/Music/ClickSong.wav";
             } else if (i == 4) {
-                path = "AppliBooker/ClientBookEncoderJava/Music/LoginSong.wav";
+                path = "ClientBookEncoderJava/Music/LoginSong.wav";
             } else if (i == 5) {
-                path = "AppliBooker/ClientBookEncoderJava/Music/LogoutSong.wav";
+                path = "ClientBookEncoderJava/Music/LogoutSong.wav";
             } else if (i == 6) {
-                path = "AppliBooker/ClientBookEncoderJava/Music/ViderSong.wav";
+                path = "ClientBookEncoderJava/Music/ViderSong.wav";
             }
             File audioFile = new File(path);
             if (!audioFile.exists()) {
