@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/AppliBooker.iml" filepath="$PROJECT_DIR$/.idea/AppliBooker.iml" />
       <module fileurl="file://$PROJECT_DIR$/CommunicationJava/CommunicationJava.iml" filepath="$PROJECT_DIR$/CommunicationJava/CommunicationJava.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CommunicationJavaSecure/CommunicationJavaSecure.iml" filepath="$PROJECT_DIR$/CommunicationJavaSecure/CommunicationJavaSecure.iml" />
     </modules>
   </component>
 </project>

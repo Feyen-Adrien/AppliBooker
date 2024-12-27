@@ -1,15 +1,11 @@
 package GUI.JDialog;
 
 import javax.swing.*;
-
 import java.awt.event.*;
-import java.io.IOException;
 
-
-
-public class ConnexionClient extends JDialog {
+public class JInscription extends JDialog {
     private JPanel contentPane;
-    private JButton buttonConnexion;
+    private JButton buttonInscription;
     private JButton buttonAnnuler;
     private JTextField textFieldNom;
     private JPanel nomPanel;
@@ -23,22 +19,20 @@ public class ConnexionClient extends JDialog {
     private JTextField textFieldPrenom;
     private JPanel controlPanel;
     private JPanel bouttonPanel;
-    private JPanel numClientPanel;
-    private JPanel numClientInput;
-    private JPanel numClientPanelInfo;
-    private JTextField textFieldNrClient;
-    private JLabel nrClientLabel;
 
-    public ConnexionClient() throws IOException {
+    public JInscription() {
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(buttonConnexion);
-        setTitle("Connexion");
+        getRootPane().setDefaultButton(buttonInscription);
+        setTitle("Inscription");
         setLocationRelativeTo(null);
         pack();// permet de prendre la taille minimale ou préféré
 
-
-        buttonAnnuler.addActionListener(e -> onCancel());
+        buttonAnnuler.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -49,14 +43,17 @@ public class ConnexionClient extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
-
 
     private void onCancel() {
+        // add your code here if necessary
         dispose();
     }
-
 
     // SETTERS / GETTERS
     public String getNom()
@@ -68,11 +65,13 @@ public class ConnexionClient extends JDialog {
         return textFieldPrenom.getText();
     }
 
-    public JButton getButtonConnexion() {
-        return buttonConnexion;
+    public JButton getButtonInscription() {
+        return buttonInscription;
     }
 
     public static void main(String[] args) {
-        // vide
+        JInscription dialog = new JInscription();
+        dialog.setVisible(true);
+        System.exit(0);
     }
 }

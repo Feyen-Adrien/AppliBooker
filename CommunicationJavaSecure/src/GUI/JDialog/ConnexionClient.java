@@ -1,8 +1,9 @@
 package GUI.JDialog;
 
 import javax.swing.*;
-
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 
@@ -24,10 +25,10 @@ public class ConnexionClient extends JDialog {
     private JPanel controlPanel;
     private JPanel bouttonPanel;
     private JPanel numClientPanel;
-    private JPanel numClientInput;
     private JPanel numClientPanelInfo;
-    private JTextField textFieldNrClient;
+    private JPanel numClientInput;
     private JLabel nrClientLabel;
+    private JTextField textFieldNrClient;
 
     public ConnexionClient() throws IOException {
         setContentPane(contentPane);
@@ -67,6 +68,7 @@ public class ConnexionClient extends JDialog {
     {
         return textFieldPrenom.getText();
     }
+    public int getNrClient() { return Integer.parseInt(textFieldNrClient.getText());}
 
     public JButton getButtonConnexion() {
         return buttonConnexion;
