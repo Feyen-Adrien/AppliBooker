@@ -1,17 +1,33 @@
 package ServeurTCP;
 
 import java.io.IOException;
-import java.net.Socket;
 
 public class ThreadClientPool extends ThreadClient {
-    public ThreadClientPool(Protocole protocole, Socket csocket, Logger logger) throws IOException {
-        super(protocole, csocket, logger);
+
+    private  FileAttente connexionEnAttente;
+
+    public ThreadClientPool(Protocole protocole, FileAttente file,ThreadGroup groupe, Logger logger) throws IOException {
+        super(protocole, groupe, logger);
+        connexionEnAttente = file;
     }
     @Override
     public void run() {
-        logger.Trace("TH client démarre");
+        logger.Trace("TH client(pool) démarre");
         logger.Trace(Thread.currentThread().getName());
-        super.run();
-        logger.Trace("TH client se termine");
+        boolean interrompu = false;
+        while (!interrompu) {
+            try {
+                logger.Trace("Attente d'une connexion...");
+                csocket = connexionEnAttente.getConnexion();
+                super.run();
+            }
+            catch (InterruptedException e)
+            {
+                logger.Trace("Demande d'interruption...");
+                interrompu = true;
+            }
+        }
+
+        logger.Trace("TH client(pool) se termine");
     }
 }

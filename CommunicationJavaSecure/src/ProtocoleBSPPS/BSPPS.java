@@ -16,18 +16,18 @@ import java.sql.SQLException;
 
 import static model.dao.ConnectDB.close;
 
-public class BSPP implements Protocole {
+public class BSPPS implements Protocole {
     private Logger logger;
     private ConnectDB connexion;
 
-    public BSPP(Logger log) {
+    public BSPPS(Logger log) {
         logger = log;
     }
 
     @Override
     public String getNom()
     {
-        return "BSPP";
+        return "BSPPS";
     }
 
     @Override

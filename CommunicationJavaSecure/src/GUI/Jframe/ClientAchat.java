@@ -272,14 +272,14 @@ public class ClientAchat extends JFrame {
         String filePath = "app.properties";
         Properties prop = new Properties();
         String ipServer;
-        String PORT_PAYEMENT;
+        String PORT_PAYEMENT_SECURE;
         try(FileInputStream inputStream = new FileInputStream(filePath))
         {
             prop.load(inputStream);
-            PORT_PAYEMENT = prop.getProperty("PORT_PAYEMENT");
+            PORT_PAYEMENT_SECURE = prop.getProperty("PORT_PAYEMENT_SECURE");
             ipServer = prop.getProperty("ipServer");
 
-            System.out.println("AdresseIP : "+ ipServer + ",port : " + PORT_PAYEMENT);
+            System.out.println("AdresseIP : "+ ipServer + ",port : " + PORT_PAYEMENT_SECURE);
 
 
         } catch (IOException e) {
@@ -287,7 +287,7 @@ public class ClientAchat extends JFrame {
         }
         try
         {
-            socket = new Socket(ipServer,Integer.parseInt(PORT_PAYEMENT));
+            socket = new Socket(ipServer,Integer.parseInt(PORT_PAYEMENT_SECURE));
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
         }

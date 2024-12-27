@@ -5,14 +5,30 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 public class ThreadServeurPool extends ThreadServeur {
-    public ThreadServeurPool(int port, Protocole protocole, Logger logger) throws IOException {
+    private FileAttente connexionsEnAttente;
+    private ThreadGroup pool;
+    private int taillePool;
+
+    public ThreadServeurPool(int port, Protocole protocole,int taillePool, Logger logger) throws IOException {
         super(port, protocole, logger);
+
+        connexionsEnAttente = new FileAttente();
+        this.taillePool = taillePool;
+        pool = new ThreadGroup("POOL");
     }
 
     @Override
     public void run() {
-        logger.Trace("Le serveur démarre...");
-        logger.Trace(Thread.currentThread().getName() + ": adresse ip = " + serverSocket.getInetAddress().getHostAddress());
+        logger.Trace("Le serveur(pool) démarre...");
+        logger.Trace(Thread.currentThread().getName() + ": adresse ip = " + serverSocket.getInetAddress().getHostAddress() + "Pool = " + taillePool);
+
+        try {
+            for (int i = 0; i < taillePool; i++) {
+                new ThreadClientPool(protocole,connexionsEnAttente,pool,logger).start();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         while (!this.isInterrupted()) {
             Socket csocket;
@@ -20,9 +36,8 @@ public class ThreadServeurPool extends ThreadServeur {
             {
                 serverSocket.setSoTimeout(2000);
                 csocket = serverSocket.accept();
-                logger.Trace("Connexion acceptée, création du thread client");
-                Thread th = new ThreadClientPool(protocole,csocket,logger);
-                th.start();
+                logger.Trace("Connexion acceptée, mise en file d'attente");
+                connexionsEnAttente.addConnexion(csocket);
             }
             catch (SocketTimeoutException e)
             {
@@ -34,9 +49,6 @@ public class ThreadServeurPool extends ThreadServeur {
             }
         }
         logger.Trace("Thread serveur interrompu");
-        try{serverSocket.close();}
-        catch (IOException e){
-            logger.Trace("Erreu I/O");
-        }
+        pool.interrupt();
     }
 }
