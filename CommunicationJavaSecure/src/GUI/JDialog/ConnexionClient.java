@@ -68,7 +68,7 @@ public class ConnexionClient extends JDialog {
     {
         return textFieldPrenom.getText();
     }
-    public int getNrClient() { return Integer.parseInt(textFieldNrClient.getText());}
+    public String getNrClient() { return textFieldNrClient.getText();}
 
     public JButton getButtonConnexion() {
         return buttonConnexion;

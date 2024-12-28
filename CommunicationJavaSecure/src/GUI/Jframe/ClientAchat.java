@@ -82,7 +82,7 @@ public class ClientAchat extends JFrame {
         // Menu affichage
         menuButton.addActionListener(e -> popupMenu.show(this,33,56));
         // Inscription
-        itemInscription.addActionListener(e1 -> {
+        /*itemInscription.addActionListener(e1 -> {
             inscription  = new JInscription();
             inscription.getButtonInscription().addActionListener(e3->{
                 if(inscription.getNom().isEmpty())
@@ -125,7 +125,7 @@ public class ClientAchat extends JFrame {
                 }
             });
             inscription.setVisible(true);
-        });
+        });*/
         // Connexion
         itemConnexion.addActionListener(e1 -> {
             try {
@@ -143,6 +143,10 @@ public class ClientAchat extends JFrame {
                         }
                         else
                         {
+                            if(connexion.getNrClient().isEmpty())
+                            {
+                                Error("Veuillez entrer un numéro de client !");
+                            }
                             try
                             {
                                 connexionServeur();
@@ -341,7 +345,7 @@ public class ClientAchat extends JFrame {
         annulerButton.setEnabled(true);
         payerButton.setEnabled(true);
         itemConnexion.setEnabled(false);
-        itemInscription.setEnabled(false);
+        //itemInscription.setEnabled(false);
         itemDeconnexion.setEnabled(true);
     }
     public void disconnected()
@@ -357,7 +361,7 @@ public class ClientAchat extends JFrame {
         payerButton.setEnabled(false);
         itemDeconnexion.setEnabled(false);
         itemConnexion.setEnabled(true);
-        itemInscription.setEnabled(true);
+        //itemInscription.setEnabled(true);
         if(NrClient != -1)
         {
             deconnexionServeur();
@@ -369,10 +373,10 @@ public class ClientAchat extends JFrame {
         popupMenu = new JPopupMenu();
 
         itemConnexion = new JMenuItem("Connexion");
-        itemInscription = new JMenuItem("Inscription");
+        //itemInscription = new JMenuItem("Inscription");
         itemDeconnexion = new JMenuItem("Deconnexion");
         popupMenu.add(itemConnexion);
-        popupMenu.add(itemInscription);
+        //popupMenu.add(itemInscription);
         popupMenu.add(itemDeconnexion);
 
         // permet de colorer en bleu l'item du menu quand la souris est dessus
@@ -391,7 +395,7 @@ public class ClientAchat extends JFrame {
         };
         // ajout du listener aux bouttons
         itemDeconnexion.addMouseListener(mouseAdapter);
-        itemInscription.addMouseListener(mouseAdapter);
+        //itemInscription.addMouseListener(mouseAdapter);
         itemConnexion.addMouseListener(mouseAdapter);
     }
     public void majListeLivres()
