@@ -3,16 +3,35 @@ package ProtocoleBSPPS;
 import ServeurTCP.Reponse;
 
 public class ReponseLOGIN implements Reponse {
-    private int nrClient;
+    private boolean valide = false ;
+    private long date;
+    private double alea;
 
 
-    ReponseLOGIN(int nrClient) {
-        setNrClient(nrClient);
+    ReponseLOGIN(boolean valide) {
+        this.valide = valide;
     }
-    public int getNrClient() {
-        return nrClient;
+    ReponseLOGIN(long date, double alea, boolean valide) {
+        this.date = date;
+        this.alea = alea;
+        this.valide = valide;
     }
-    public void setNrClient(int nrClient) {
-        this.nrClient = nrClient;
+    public boolean isValide() {
+        return valide;
+    }
+    public void setValide(boolean valide) {
+        this.valide = valide;
+    }
+    public long getDate() {
+        return date;
+    }
+    public void setDate(long date) {
+        this.date = date;
+    }
+    public double getAlea() {
+        return alea;
+    }
+    public void setAlea(double alea) {
+        this.alea = alea;
     }
 }

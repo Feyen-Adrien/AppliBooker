@@ -1,3 +1,4 @@
+import Crypto.KeysMaker;
 import ProtocoleBSPPS.BSPPS;
 import ServeurTCP.Logger;
 import ServeurTCP.Protocole;
@@ -8,7 +9,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class ServeurBSPPS implements Logger {
-    public ServeurBSPPS() throws IOException {
+    public ServeurBSPPS() throws Exception {
         // Lis les données du fichier properties
         String filePath = "app.properties";
         String PORT_PAYEMENT_SECURE;
@@ -33,10 +34,13 @@ public class ServeurBSPPS implements Logger {
         }
         Protocole protocole = new BSPPS(this);
 
+        // Ajout de la clé privé et publique du serveur
+        KeysMaker k = new KeysMaker("Serveur");
+
         ThreadServeurPool Server = new ThreadServeurPool(Integer.parseInt(PORT_PAYEMENT_SECURE), protocole,Integer.parseInt(NbThreads),this);
         Server.start();
     }
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         new ServeurBSPPS();
     }
 

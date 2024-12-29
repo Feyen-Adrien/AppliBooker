@@ -1,9 +1,11 @@
 package GUI.Jframe;
 
+import Crypto.KeysMaker;
 import GUI.JDialog.*;
 import ProtocoleBSPPS.*;
 import model.entity.Book;
 import model.entity.CaddyItems;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,11 +14,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -153,22 +156,44 @@ public class ClientAchat extends JFrame {
                                 RequeteLOGIN requete = new RequeteLOGIN(connexion.getNom(),connexion.getPrenom());
                                 out.writeObject(requete);
                                 ReponseLOGIN reponse = (ReponseLOGIN) in.readObject();
-                                if(reponse.getNrClient() != -1)
+                                Security.addProvider(new BouncyCastleProvider());
+                                if(reponse.isValide())
                                 {
-                                    setNom(connexion.getNom());
-                                    setPrenom(connexion.getPrenom());
-                                    NrClient = reponse.getNrClient();
-                                    Succes("Connexion réussi ! Numéro de client = " + NrClient);
-                                    connexion.dispose();
-                                    connected(); // active les bouttons
-                                    majListeLivres();
+                                    // création du digest
+                                    MessageDigest md = MessageDigest.getInstance("SHA-1","BC");
+                                    md.update(connexion.getNom().getBytes());
+                                    md.update(connexion.getPrenom().getBytes());
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    DataOutputStream dos = new DataOutputStream(baos);
+                                    dos.writeLong(reponse.getDate());
+                                    dos.writeDouble(reponse.getAlea());
+                                    dos.writeInt(Integer.parseInt(connexion.getNrClient()));
+                                    md.update(baos.toByteArray());
+                                    byte[] digest = md.digest();
+                                    out.writeObject(new RequeteLOGIN(connexion.getNom(),connexion.getPrenom(),digest));
+                                    ReponseLOGIN reponse2 = (ReponseLOGIN) in.readObject();
+                                    if(reponse2.isValide())
+                                    {
+                                        setNom(connexion.getNom());
+                                        setPrenom(connexion.getPrenom());
+                                        NrClient = Integer.parseInt(connexion.getNrClient());
+                                        Succes("Connexion réussi !");
+                                        connexion.dispose();
+                                        connected(); // active les bouttons
+                                        majListeLivres();
+                                        // création clé publiques/privées
+                                        KeysMaker km = new KeysMaker(nom+prenom);
+                                    }
+                                    else {
+                                        Error("Numéro de client incorrect !");
+                                        deconnexionServeur();
+                                    }
                                 }
-                                else
-                                {
-                                    Error("Nom ou prénom incorrecte !");
+                                else {
+                                    Error("Nom ou prénom incorrect !");
                                     deconnexionServeur();
                                 }
-                            } catch (ClassNotFoundException | IOException e) {
+                            } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
                         }

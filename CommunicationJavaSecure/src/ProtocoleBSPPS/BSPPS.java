@@ -8,17 +8,30 @@ import model.dao.*;
 import model.entity.Book;
 import model.entity.Caddies;
 import model.entity.CaddyItems;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Security;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 import static model.dao.ConnectDB.close;
 
 public class BSPPS implements Protocole {
     private Logger logger;
     private ConnectDB connexion;
+    // création du sel
+    long time = new Date().getTime();
+    double alea = Math.random();
 
     public BSPPS(Logger log) {
         logger = log;
@@ -78,19 +91,46 @@ public class BSPPS implements Protocole {
             res = stmt.executeQuery();
 
             if (res.next()) {
-                // Si un utilisateur correspondant est trouvé, il est connecté avec succès
-                String ipPortClient = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
-                logger.Trace(requete.getUserName() + " est correctement loggé au serveur (ip:port) : " + ipPortClient);
+                // création du digest
+                Security.addProvider(new BouncyCastleProvider());
+                if(requete.getPassword() == null) {
+                    return new ReponseLOGIN(time,alea,true);
+                }
+                else {
+                    // création du digest
+                    MessageDigest md = MessageDigest.getInstance("SHA-1","BC");
+                    md.update(requete.getUserName().getBytes());
+                    md.update(requete.getFirstName().getBytes());
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    DataOutputStream dos = new DataOutputStream(baos);
+                    dos.writeLong(time);
+                    dos.writeDouble(alea);
+                    dos.writeInt(res.getInt("clientNr"));
+                    md.update(baos.toByteArray());
+                    byte[] digestServe = md.digest();
+                    if(MessageDigest.isEqual(digestServe,requete.getPassword()))
+                    {
+                        // Si un utilisateur correspondant est trouvé, il est connecté avec succès
+                        String ipPortClient = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
+                        logger.Trace(requete.getUserName() + " est correctement loggé au serveur (ip:port) : " + ipPortClient);
+                        return new ReponseLOGIN(true);
+                    }
+                    else
+                    {
+                        return new ReponseLOGIN(false);
+                    }
+                }
 
-                return new ReponseLOGIN(res.getInt("clientNr"));
             } else {
                 // Aucun utilisateur correspondant trouvé
                 logger.Trace(requete.getUserName() + " : mauvais identifiants.");
-                return new ReponseLOGIN(-1); // Répondre avec échec
+                return new ReponseLOGIN(false); // Répondre avec échec
             }
         } catch (SQLException e) {
             logger.Trace("Erreur SQL lors de la vérification de l'utilisateur : " + e.getMessage());
-            return new ReponseLOGIN(-1);
+            return new ReponseLOGIN(false);
+        } catch (NoSuchProviderException | IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         } finally {
             // Nettoyer les ressources pour éviter les fuites
             try {
