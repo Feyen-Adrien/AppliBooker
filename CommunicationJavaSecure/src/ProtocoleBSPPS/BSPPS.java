@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import static model.dao.ConnectDB.close;
@@ -35,7 +36,8 @@ public class BSPPS implements Protocole {
     private PrivateKey privateKey = k.getPrivateKey();
     private PublicKey publicKey = k.getPublicKey();
     private int emplSecretKey =0;
-    private ArrayList<SecretKey> secretKeys = new ArrayList<SecretKey>(); // pour contenir les différentes clé de session
+    private ArrayList<SecretKey> secretKeys = new ArrayList<SecretKey>();// pour contenir les différentes clé de session
+    private ArrayList<PublicKey> clientsKeys = new ArrayList<PublicKey>();
     // création du sel
     long time = new Date().getTime();
     double alea = Math.random();
@@ -129,6 +131,7 @@ public class BSPPS implements Protocole {
                             SecretKey s=MyCrypto.get3DESKeyFromBytes(MyCrypto.DecryptAsymRSA(privateKey, requete.getSecretKey()));
                             logger.Trace(String.valueOf(s));
                             secretKeys.add(s);
+                            clientsKeys.add(requete.getPublicKey());
                             return new ReponseLOGIN(true);
                         }
                         else
@@ -378,8 +381,12 @@ public class BSPPS implements Protocole {
 
         logger.Trace("Requête DeleteCaddyItem reçue");
         try {
+            byte[] messagedecrypte = MyCrypto.DecryptSym3DES(secretKeys.get(requete.getEmplSecretKey()),requete.getData());
+            ByteArrayInputStream bais = new ByteArrayInputStream(messagedecrypte);
+            DataInputStream dis = new DataInputStream(bais);
+            int id = dis.readInt();
             // misa à jour du livre
-            CaddyItems caddyItems = caddyItemsDAO.getCaddyItemsbyId(requete.getIdItemCaddy());
+            CaddyItems caddyItems = caddyItemsDAO.getCaddyItemsbyId(id);
             Book book = bookDAO.getBookById(caddyItems.getBookId());
             book.setStock_quantity(book.getStock_quantity()+caddyItems.getQuantity());
             bookDAO.updateBook(book);
@@ -389,7 +396,8 @@ public class BSPPS implements Protocole {
             float montantARetirer = (caddyItems.getQuantity()*book.getPrice())*-1;
             caddiesDAO.updateCaddiesAmount(caddyItems.getCaddyId(), montantARetirer);
             reponseDELETECaddyItem.setValid(true);
-        } catch (SQLException e) {
+        } catch (SQLException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
+                 IllegalBlockSizeException | BadPaddingException | NoSuchProviderException | IOException e) {
             logger.Trace("Error lors du delete caddyItem : " + e.getMessage());
             reponseDELETECaddyItem.setValid(false);
         }
@@ -399,15 +407,44 @@ public class BSPPS implements Protocole {
     private synchronized ReponseUPDATE_CADDY_PAYED TraiteRequeteUpdateCaddyItemPayed(RequeteUPDATE_CADDY_PAYED requete)
     {
         CaddiesDAO caddiesDAO = CaddiesDAO.getInstance();
-        ReponseUPDATE_CADDY_PAYED reponseUPDATECaddyPayed = new ReponseUPDATE_CADDY_PAYED();
+        ReponseUPDATE_CADDY_PAYED reponseUPDATECaddyPayed;
 
         logger.Trace("Requête UpdateCaddyItemPayed reçue");
         try
         {
-            caddiesDAO.updateCaddiesPayed(requete.getIdCaddy());
-            reponseUPDATECaddyPayed.setValide(true);
-        } catch (SQLException e) {
+            // récupération données symétriquement
+            byte[] messagedecrypte = MyCrypto.DecryptSym3DES(secretKeys.get(requete.getEmplKey()),requete.getData());
+            ByteArrayInputStream bais = new ByteArrayInputStream(messagedecrypte);
+            DataInputStream dis = new DataInputStream(bais);
+            int idCaddy = dis.readInt();
+            String numVisa = dis.readUTF();
+            String nomVisa = dis.readUTF();
+
+            // vérifie la signature (si elles correspondent) avec les données recupérées
+            Security.addProvider(new BouncyCastleProvider());
+            Signature s = Signature.getInstance("SHA1withRSA","BC");
+            s.initVerify(clientsKeys.get(requete.getEmplKey()));
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(bos);
+            dos.writeInt(idCaddy);
+            dos.writeUTF(numVisa);
+            dos.writeUTF(nomVisa);
+            s.update(bos.toByteArray());
+            if(s.verify(requete.getSignature()))
+            {
+                caddiesDAO.updateCaddiesPayed(idCaddy);
+                reponseUPDATECaddyPayed = new ReponseUPDATE_CADDY_PAYED(true, secretKeys.get(requete.getEmplKey()));
+            }
+            else
+            {
+                reponseUPDATECaddyPayed =new ReponseUPDATE_CADDY_PAYED();
+                reponseUPDATECaddyPayed.setValide(false);
+            }
+
+        } catch (SQLException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | IOException |
+                 SignatureException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException e) {
             logger.Trace("Error lors du UpdateCaddyItemPayed : " + e.getMessage());
+            reponseUPDATECaddyPayed =new ReponseUPDATE_CADDY_PAYED();
             reponseUPDATECaddyPayed.setValide(false);
         }
         return reponseUPDATECaddyPayed;
@@ -416,16 +453,39 @@ public class BSPPS implements Protocole {
     private synchronized ReponseDELETE_CADDY TraiteRequeteDeleteCaddy(RequeteDELETE_CADDY requete)
     {
         CaddiesDAO caddiesDAO = CaddiesDAO.getInstance();
-        ReponseDELETE_CADDY reponseDELETECaddy = new ReponseDELETE_CADDY();
+        ReponseDELETE_CADDY reponseDELETECaddy;
 
         logger.Trace("Requête DeleteCaddy reçue");
         try
         {
-            caddiesDAO.deleteCaddies(requete.getIdCaddy());
-            reponseDELETECaddy.setValid(true);
-        } catch (SQLException e) {
+            // vérifie la signature (si elles correspondent)
+            Security.addProvider(new BouncyCastleProvider());
+            Signature s = Signature.getInstance("SHA1withRSA","BC");
+            s.initVerify(clientsKeys.get(requete.getEmplKey()));
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(bos);
+            dos.writeInt(requete.getIdCaddy());
+            s.update(bos.toByteArray());
+
+            if(s.verify(requete.getSignature()))
+            {
+                logger.Trace("Signature OK ");
+                caddiesDAO.deleteCaddies(requete.getIdCaddy());
+                reponseDELETECaddy =  new ReponseDELETE_CADDY(true, secretKeys.get(requete.getEmplKey()));
+
+            }
+            else
+            {
+                reponseDELETECaddy = new ReponseDELETE_CADDY();
+                reponseDELETECaddy.setValid(false);
+            }
+
+        } catch (SQLException | NoSuchAlgorithmException | NoSuchProviderException e) {
             logger.Trace("Error lors du DeleteCaddy : " + e.getMessage());
+            reponseDELETECaddy =new ReponseDELETE_CADDY();
             reponseDELETECaddy.setValid(false);
+        } catch (InvalidKeyException | IOException | SignatureException e) {
+            throw new RuntimeException(e);
         }
         return reponseDELETECaddy;
     }

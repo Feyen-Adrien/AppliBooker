@@ -8,10 +8,7 @@ import model.entity.Book;
 import model.entity.CaddyItems;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -74,6 +71,7 @@ public class ClientAchat extends JFrame {
     private PrivateKey privateKey;
     private PublicKey publicKeyServeur;
     private SecretKey secretKey;
+    private PublicKey publicKey;
 
     public ClientAchat() {
         // configuration du Jframe
@@ -160,7 +158,7 @@ public class ClientAchat extends JFrame {
                             try
                             {
                                 connexionServeur();
-                                RequeteLOGIN requete = new RequeteLOGIN(connexion.getNom(),connexion.getPrenom(),null,null);
+                                RequeteLOGIN requete = new RequeteLOGIN(connexion.getNom(),connexion.getPrenom(),null,null,null);
                                 out.writeObject(requete);
                                 ReponseLOGIN reponse = (ReponseLOGIN) in.readObject();
                                 Security.addProvider(new BouncyCastleProvider());
@@ -177,7 +175,7 @@ public class ClientAchat extends JFrame {
                                     dos.writeInt(Integer.parseInt(connexion.getNrClient()));
                                     md.update(baos.toByteArray());
                                     byte[] digest = md.digest();
-                                    out.writeObject(new RequeteLOGIN(connexion.getNom(),connexion.getPrenom(),digest,null));
+                                    out.writeObject(new RequeteLOGIN(connexion.getNom(),connexion.getPrenom(),digest,null,null));
                                     ReponseLOGIN reponse2 = (ReponseLOGIN) in.readObject();
                                     if(reponse2.isValide())
                                     {
@@ -187,10 +185,11 @@ public class ClientAchat extends JFrame {
                                         emplKey = reponse2.getEmplSecretKey();// pour savoir où est la clé secrete dans l'array list serveur
                                         // création clé publiques/privées
                                         KeysMaker km = new KeysMaker();
+                                        publicKey = km.getPublicKey();
                                         privateKey = km.getPrivateKey();
                                         publicKeyServeur = reponse2.getPublicKey();
                                         secretKey = MyCrypto.generate3DESKey();// création d'une clé de session
-                                        out.writeObject(new RequeteLOGIN(nom,prenom,null,MyCrypto.CryptAsymRSA(publicKeyServeur,secretKey.getEncoded())));// envoie de la clé de session
+                                        out.writeObject(new RequeteLOGIN(nom,prenom,null,MyCrypto.CryptAsymRSA(publicKeyServeur,secretKey.getEncoded()),publicKey));// envoie de la clé de session
                                         ReponseLOGIN reponse3 = (ReponseLOGIN) in.readObject();
                                         if(reponse3.isValide())
                                         {
@@ -281,8 +280,28 @@ public class ClientAchat extends JFrame {
         });
         // Payement caddy
         payerButton.addActionListener(e -> {
-           payed();
-           disconnected();
+            VISAencode visa = new VISAencode();
+            visa.getButtonOK().addActionListener(e2 ->{
+                if(visa.getNomVISA().isEmpty())
+                {
+                    Error("Veuillez entrez un nom de VISA !");
+                }
+                else
+                {
+                    if(visa.getNumVISA().isEmpty())
+                    {
+                        Error("Veuillez entrer un numéro de VISA !");
+                    }
+                    else
+                    {
+                        payed(visa.getNomVISA(),visa.getNumVISA());
+                        visa.dispose();
+                        disconnected();
+                    }
+                }
+            });
+            visa.setVisible(true);
+
         });
         // Annulation
         annulerButton.addActionListener(e -> {
@@ -588,7 +607,7 @@ public class ClientAchat extends JFrame {
                 CaddyItems caddyItem;
                 caddyItem = Caddyitems.get(PanierTable.getSelectedRow());
 
-                RequeteDELETE_CADDY_ITEM requeteDELETE_caddy_item = new RequeteDELETE_CADDY_ITEM(caddyItem.getId());
+                RequeteDELETE_CADDY_ITEM requeteDELETE_caddy_item = new RequeteDELETE_CADDY_ITEM(caddyItem.getId(),secretKey,emplKey);
                 out.writeObject(requeteDELETE_caddy_item);
                 ReponseDELETE_CADDY_ITEM reponseDELETE_caddy_item;
                 reponseDELETE_caddy_item = (ReponseDELETE_CADDY_ITEM) in.readObject();
@@ -603,7 +622,8 @@ public class ClientAchat extends JFrame {
                     majListeLivres();
                 }
             }
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (ClassNotFoundException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
+                 NoSuchAlgorithmException | BadPaddingException | InvalidKeyException | NoSuchProviderException e) {
             throw new RuntimeException(e);
         }
     }
@@ -614,7 +634,7 @@ public class ClientAchat extends JFrame {
 
             for (CaddyItems caddyItem : caddyItems) {
 
-                RequeteDELETE_CADDY_ITEM requeteDELETE_caddy_item = new RequeteDELETE_CADDY_ITEM(caddyItem.getId());
+                RequeteDELETE_CADDY_ITEM requeteDELETE_caddy_item = new RequeteDELETE_CADDY_ITEM(caddyItem.getId(),secretKey,emplKey);
                 out.writeObject(requeteDELETE_caddy_item);
                 ReponseDELETE_CADDY_ITEM reponseDELETE_caddy_item;
                 reponseDELETE_caddy_item = (ReponseDELETE_CADDY_ITEM) in.readObject();
@@ -628,30 +648,42 @@ public class ClientAchat extends JFrame {
             majCaddy();
             majListeLivres();
 
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (ClassNotFoundException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
+                 NoSuchAlgorithmException | BadPaddingException | InvalidKeyException | NoSuchProviderException e) {
             throw new RuntimeException(e);
         }
 
 
     }
-    public void payed()
+    public void payed(String nomVisa, String numVISA)
     {
         try {
             //Flaggé comme payé
-            RequeteUPDATE_CADDY_PAYED requeteUPDATECaddyPayed = new RequeteUPDATE_CADDY_PAYED(idCaddy);
+            RequeteUPDATE_CADDY_PAYED requeteUPDATECaddyPayed = new RequeteUPDATE_CADDY_PAYED(idCaddy,numVISA,nomVisa,secretKey,privateKey,emplKey);
             out.writeObject(requeteUPDATECaddyPayed);
             ReponseUPDATE_CADDY_PAYED reponseUPDATECaddyPayed;
             reponseUPDATECaddyPayed = (ReponseUPDATE_CADDY_PAYED) in.readObject();
-
-            if (!reponseUPDATECaddyPayed.isValide()) {
+            // Construction du HMAC local
+            Mac hm = Mac.getInstance("HMAC-MD5","BC");
+            hm.init(secretKey);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
+            dos.writeBoolean(reponseUPDATECaddyPayed.isValide());
+            hm.update(baos.toByteArray());
+            byte[] hmacloc = hm.doFinal();
+            // compare le hmac pour voir si les données sont bonnes
+            if (!MessageDigest.isEqual(hmacloc,reponseUPDATECaddyPayed.getHmac())) {
                 Error("Erreur lors du marquage du caddy comme payé !");
                 return;
             }
             Succes("Caddy Payé avec Succès");
 
             disconnected();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new RuntimeException("Erreur lors du paiement : " + e.getMessage());
+        } catch (InvalidKeyException | SignatureException | NoSuchPaddingException | IllegalBlockSizeException |
+                 BadPaddingException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -659,18 +691,28 @@ public class ClientAchat extends JFrame {
     {
         try
         {
-            RequeteDELETE_CADDY requeteDELETECaddy = new RequeteDELETE_CADDY(idCaddy);
+            RequeteDELETE_CADDY requeteDELETECaddy = new RequeteDELETE_CADDY(idCaddy,privateKey,emplKey);
             out.writeObject(requeteDELETECaddy);
             ReponseDELETE_CADDY reponseDELETECaddy;
             reponseDELETECaddy = (ReponseDELETE_CADDY) in.readObject();
 
-            if (!reponseDELETECaddy.isValid()) {
+            // Construction du HMAC local
+            Mac hm = Mac.getInstance("HMAC-MD5","BC");
+            hm.init(secretKey);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
+            dos.writeBoolean(reponseDELETECaddy.isValid());
+            hm.update(baos.toByteArray());
+            byte[] hmacloc = hm.doFinal();
+            // comparaison des 2 hmac
+            if (!MessageDigest.isEqual(hmacloc,reponseDELETECaddy.getHmac())) {
                 Error("Erreur lors de la suppression du caddy et des caddyItem !");
                 return;
             }
             Succes("Caddy Corectement supprimé");
 
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (ClassNotFoundException | IOException | InvalidKeyException | NoSuchAlgorithmException |
+                 NoSuchProviderException | SignatureException e) {
             throw new RuntimeException(e);
         }
     }
