@@ -34,9 +34,6 @@ public class ServeurBSPPS implements Logger {
         }
         Protocole protocole = new BSPPS(this);
 
-        // Ajout de la clé privé et publique du serveur
-        KeysMaker k = new KeysMaker("Serveur");
-
         ThreadServeurPool Server = new ThreadServeurPool(Integer.parseInt(PORT_PAYEMENT_SECURE), protocole,Integer.parseInt(NbThreads),this);
         Server.start();
     }

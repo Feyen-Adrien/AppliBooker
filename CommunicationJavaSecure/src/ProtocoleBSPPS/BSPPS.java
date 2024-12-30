@@ -1,5 +1,7 @@
 package ProtocoleBSPPS;
 
+import Crypto.KeysMaker;
+import Crypto.MyCrypto;
 import ServeurTCP.Logger;
 import ServeurTCP.Protocole;
 import ServeurTCP.Reponse;
@@ -10,18 +12,17 @@ import model.entity.Caddies;
 import model.entity.CaddyItems;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
+import java.security.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static model.dao.ConnectDB.close;
@@ -29,11 +30,17 @@ import static model.dao.ConnectDB.close;
 public class BSPPS implements Protocole {
     private Logger logger;
     private ConnectDB connexion;
+    // Ajout de la clé privé et publique du serveur
+    private KeysMaker k = new KeysMaker();
+    private PrivateKey privateKey = k.getPrivateKey();
+    private PublicKey publicKey = k.getPublicKey();
+    private int emplSecretKey =0;
+    private ArrayList<SecretKey> secretKeys = new ArrayList<SecretKey>(); // pour contenir les différentes clé de session
     // création du sel
     long time = new Date().getTime();
     double alea = Math.random();
 
-    public BSPPS(Logger log) {
+    public BSPPS(Logger log) throws Exception {
         logger = log;
     }
 
@@ -73,8 +80,7 @@ public class BSPPS implements Protocole {
         return null;
     }
 
-    private synchronized ReponseLOGIN TraiteRequeteLOGIN(RequeteLOGIN requete, Socket socket)
-    {
+    private synchronized ReponseLOGIN TraiteRequeteLOGIN(RequeteLOGIN requete, Socket socket) {
         logger.Trace("Requete LOGIN reçue de " + requete.getUserName());
 
         connexion = new ConnectDB();
@@ -93,32 +99,44 @@ public class BSPPS implements Protocole {
             if (res.next()) {
                 // création du digest
                 Security.addProvider(new BouncyCastleProvider());
-                if(requete.getPassword() == null) {
-                    return new ReponseLOGIN(time,alea,true);
-                }
-                else {
-                    // création du digest
-                    MessageDigest md = MessageDigest.getInstance("SHA-1","BC");
-                    md.update(requete.getUserName().getBytes());
-                    md.update(requete.getFirstName().getBytes());
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    DataOutputStream dos = new DataOutputStream(baos);
-                    dos.writeLong(time);
-                    dos.writeDouble(alea);
-                    dos.writeInt(res.getInt("clientNr"));
-                    md.update(baos.toByteArray());
-                    byte[] digestServe = md.digest();
-                    if(MessageDigest.isEqual(digestServe,requete.getPassword()))
-                    {
-                        // Si un utilisateur correspondant est trouvé, il est connecté avec succès
-                        String ipPortClient = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
-                        logger.Trace(requete.getUserName() + " est correctement loggé au serveur (ip:port) : " + ipPortClient);
-                        return new ReponseLOGIN(true);
+                if (requete.getPassword() == null && requete.getSecretKey() == null) {
+                    return new ReponseLOGIN(time, alea, true);
+                } else {
+                    if (requete.getPassword() != null && requete.getSecretKey() == null) {
+                        // création du digest
+                        MessageDigest md = MessageDigest.getInstance("SHA-1", "BC");
+                        md.update(requete.getUserName().getBytes());
+                        md.update(requete.getFirstName().getBytes());
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        DataOutputStream dos = new DataOutputStream(baos);
+                        dos.writeLong(time);
+                        dos.writeDouble(alea);
+                        dos.writeInt(res.getInt("clientNr"));
+                        md.update(baos.toByteArray());
+                        byte[] digestServe = md.digest();
+                        if (MessageDigest.isEqual(digestServe, requete.getPassword())) {
+                            // Si un utilisateur correspondant est trouvé, il est connecté avec succès
+                            String ipPortClient = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
+                            logger.Trace(requete.getUserName() + " est correctement loggé au serveur (ip:port) : " + ipPortClient);
+                            emplSecretKey++;
+                            return new ReponseLOGIN(true, publicKey,emplSecretKey-1);
+
+                        } else {
+                            return new ReponseLOGIN(false);
+                        }
+                    } else {
+                        if (requete.getPassword() == null && requete.getSecretKey() != null) {
+                            SecretKey s=MyCrypto.get3DESKeyFromBytes(MyCrypto.DecryptAsymRSA(privateKey, requete.getSecretKey()));
+                            logger.Trace(String.valueOf(s));
+                            secretKeys.add(s);
+                            return new ReponseLOGIN(true);
+                        }
+                        else
+                        {
+                            return new ReponseLOGIN(false);
+                        }
                     }
-                    else
-                    {
-                        return new ReponseLOGIN(false);
-                    }
+
                 }
 
             } else {
@@ -129,7 +147,8 @@ public class BSPPS implements Protocole {
         } catch (SQLException e) {
             logger.Trace("Erreur SQL lors de la vérification de l'utilisateur : " + e.getMessage());
             return new ReponseLOGIN(false);
-        } catch (NoSuchProviderException | IOException | NoSuchAlgorithmException e) {
+        } catch (NoSuchProviderException | IOException | NoSuchAlgorithmException | InvalidKeyException |
+                 BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
             throw new RuntimeException(e);
         } finally {
             // Nettoyer les ressources pour éviter les fuites
@@ -279,7 +298,14 @@ public class BSPPS implements Protocole {
 
 
         try {
-            Book book = bookDAO.getBookById(requete.getIdLivre());
+            byte[] messagedecrypte = MyCrypto.DecryptSym3DES(secretKeys.get(requete.getEmplSecretKey()),requete.getData());
+            ByteArrayInputStream bais = new ByteArrayInputStream(messagedecrypte);
+            DataInputStream dis = new DataInputStream(bais);
+            int id = dis.readInt();
+            int qte = dis.readInt();
+            int caddyCreated = dis.readInt();
+            int nrClient = dis.readInt();
+            Book book = bookDAO.getBookById(id);
             if(book.getStock_quantity()>0)
             {
                 CaddiesDAO caddiesDAO = CaddiesDAO.getInstance();
@@ -287,26 +313,26 @@ public class BSPPS implements Protocole {
                 Caddies caddies;
                 CaddyItems caddyItems;
                 // MAJ livre
-                book.setStock_quantity(book.getStock_quantity()-requete.getQuantite());
+                book.setStock_quantity(book.getStock_quantity()-qte);
                 bookDAO.updateBook(book);
                 // Ajout dans caddy + creation caddy si inexistant
-                if(requete.isCaddyCreated()==-1)
+                if(caddyCreated==-1)
                 {
-                    caddies = new Caddies(null,requete.getIdClient(),null,0,null);
+                    caddies = new Caddies(null,nrClient,null,0,null);
                     caddiesDAO.addCaddies(caddies);
                     logger.Trace("Id caddy créee : " + caddies.getId());
-                    caddyItems = new CaddyItems(null,caddies.getId(),requete.getIdLivre(),requete.getQuantite());
+                    caddyItems = new CaddyItems(null,caddies.getId(),id,qte);
                     caddyItemsDAO.addCaddyItems(caddyItems);
-                    caddiesDAO.updateCaddiesAmount(caddies.getId(),book.getPrice()*requete.getQuantite());
+                    caddiesDAO.updateCaddiesAmount(caddies.getId(),book.getPrice()*qte);
 
                     return new ReponseADD_CADDY_ITEM(caddies.getId());
                 }
                 else
                 {
-                    caddyItems = new CaddyItems(null,requete.isCaddyCreated(),requete.getIdLivre(),requete.getQuantite());
+                    caddyItems = new CaddyItems(null,caddyCreated,id,qte);
                     caddyItemsDAO.addCaddyItems(caddyItems);
-                    caddiesDAO.updateCaddiesAmount(requete.isCaddyCreated(), book.getPrice()*requete.getQuantite());
-                    return new ReponseADD_CADDY_ITEM(requete.isCaddyCreated());
+                    caddiesDAO.updateCaddiesAmount(caddyCreated, book.getPrice()*qte);
+                    return new ReponseADD_CADDY_ITEM(caddyCreated);
                 }
 
             }
@@ -314,7 +340,8 @@ public class BSPPS implements Protocole {
             {
                 return new ReponseADD_CADDY_ITEM(-2);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
+                 IllegalBlockSizeException | BadPaddingException | NoSuchProviderException | IOException e) {
             throw new RuntimeException(e);
         }
     }

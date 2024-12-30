@@ -6,16 +6,18 @@ public class RequeteLOGIN implements Requete {
     private String userName;
     private String firstName;
     private byte[] password = null;
+    private byte[] secretKey = null;
 
     public RequeteLOGIN(String userName, String firstName) {
         setUserName(userName);
         setFirstName(firstName);
     }
 
-    public RequeteLOGIN(String userName, String firstName, byte[] password) {
+    public RequeteLOGIN(String userName, String firstName, byte[] password, byte[] secretKey) {
         setUserName(userName);
         setFirstName(firstName);
         setPassword(password);
+        setSecretKey(secretKey);
     }
     public String getUserName() {
         return userName;
@@ -34,5 +36,11 @@ public class RequeteLOGIN implements Requete {
     }
     public void setPassword(byte[] password) {
         this.password = password;
+    }
+    public byte[] getSecretKey() {
+        return secretKey;
+    }
+    public void setSecretKey(byte[] secretKey) {
+        this.secretKey = secretKey;
     }
 }

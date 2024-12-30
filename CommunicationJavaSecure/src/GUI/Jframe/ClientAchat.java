@@ -1,12 +1,17 @@
 package GUI.Jframe;
 
 import Crypto.KeysMaker;
+import Crypto.MyCrypto;
 import GUI.JDialog.*;
 import ProtocoleBSPPS.*;
 import model.entity.Book;
 import model.entity.CaddyItems;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -16,10 +21,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.Socket;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
+import java.security.*;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -29,6 +31,7 @@ public class ClientAchat extends JFrame {
     private String prenom;
     private int NrClient=-1;
     private int idCaddy=-1;
+    private int emplKey=-1;
     private String Auteur = " ";
     private String Titre = " ";
     private String Sujet =" ";
@@ -67,6 +70,10 @@ public class ClientAchat extends JFrame {
     private DefaultTableModel modeleCaddy;
     private ArrayList<Book> ListeLivres;
     private ArrayList<CaddyItems> Caddyitems;
+
+    private PrivateKey privateKey;
+    private PublicKey publicKeyServeur;
+    private SecretKey secretKey;
 
     public ClientAchat() {
         // configuration du Jframe
@@ -153,7 +160,7 @@ public class ClientAchat extends JFrame {
                             try
                             {
                                 connexionServeur();
-                                RequeteLOGIN requete = new RequeteLOGIN(connexion.getNom(),connexion.getPrenom());
+                                RequeteLOGIN requete = new RequeteLOGIN(connexion.getNom(),connexion.getPrenom(),null,null);
                                 out.writeObject(requete);
                                 ReponseLOGIN reponse = (ReponseLOGIN) in.readObject();
                                 Security.addProvider(new BouncyCastleProvider());
@@ -170,19 +177,33 @@ public class ClientAchat extends JFrame {
                                     dos.writeInt(Integer.parseInt(connexion.getNrClient()));
                                     md.update(baos.toByteArray());
                                     byte[] digest = md.digest();
-                                    out.writeObject(new RequeteLOGIN(connexion.getNom(),connexion.getPrenom(),digest));
+                                    out.writeObject(new RequeteLOGIN(connexion.getNom(),connexion.getPrenom(),digest,null));
                                     ReponseLOGIN reponse2 = (ReponseLOGIN) in.readObject();
                                     if(reponse2.isValide())
                                     {
                                         setNom(connexion.getNom());
                                         setPrenom(connexion.getPrenom());
                                         NrClient = Integer.parseInt(connexion.getNrClient());
-                                        Succes("Connexion réussi !");
-                                        connexion.dispose();
-                                        connected(); // active les bouttons
-                                        majListeLivres();
+                                        emplKey = reponse2.getEmplSecretKey();// pour savoir où est la clé secrete dans l'array list serveur
                                         // création clé publiques/privées
-                                        KeysMaker km = new KeysMaker(nom+prenom);
+                                        KeysMaker km = new KeysMaker();
+                                        privateKey = km.getPrivateKey();
+                                        publicKeyServeur = reponse2.getPublicKey();
+                                        secretKey = MyCrypto.generate3DESKey();// création d'une clé de session
+                                        out.writeObject(new RequeteLOGIN(nom,prenom,null,MyCrypto.CryptAsymRSA(publicKeyServeur,secretKey.getEncoded())));// envoie de la clé de session
+                                        ReponseLOGIN reponse3 = (ReponseLOGIN) in.readObject();
+                                        if(reponse3.isValide())
+                                        {
+                                            System.out.println("Clé =" + secretKey);
+                                            Succes("Connexion réussie");
+                                            connexion.dispose();
+                                            connected(); // active les bouttons
+                                            majListeLivres();
+                                        }
+                                        else
+                                        {
+                                            Error("Erreur lors de la création de la clé de session");
+                                        }
                                     }
                                     else {
                                         Error("Numéro de client incorrect !");
@@ -533,7 +554,7 @@ public class ClientAchat extends JFrame {
                     Book book;
                     book = ListeLivres.get(TableLivre.getSelectedRow());
 
-                    RequeteADD_CADDY_ITEM requeteADDCaddyItem = new RequeteADD_CADDY_ITEM(book.getId(),qte,idCaddy,NrClient-1000);
+                    RequeteADD_CADDY_ITEM requeteADDCaddyItem = new RequeteADD_CADDY_ITEM(book.getId(),qte,idCaddy,NrClient-1000,secretKey,emplKey);
                     out.writeObject(requeteADDCaddyItem);
                     ReponseADD_CADDY_ITEM reponseADDCaddyItem;
                     reponseADDCaddyItem = (ReponseADD_CADDY_ITEM) in.readObject();
@@ -550,7 +571,8 @@ public class ClientAchat extends JFrame {
                     }
                 }
             }
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (ClassNotFoundException | IOException | NoSuchPaddingException | IllegalBlockSizeException |
+                 NoSuchAlgorithmException | BadPaddingException | InvalidKeyException | NoSuchProviderException e) {
             throw new RuntimeException(e);
         }
     }
