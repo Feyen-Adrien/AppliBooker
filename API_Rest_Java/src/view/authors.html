@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Les auteurs</title>
+    <link rel="stylesheet" type="text/css" href="../style/style.css">
+</head>
+<body>
+<div class="container">
+    <nav>
+        <ul>
+            <li><a href="index.html">Accueil</a> </li>
+            <li><a href="authors.html">Auteurs</a></li>
+            <li><a href="books.html">Livres</a> </li>
+            <li><a href="subjects.html">Sujets</a> </li>
+        </ul>
+    </nav>
+    <!-- Titre de la page -->
+    <h2>Liste des Auteurs</h2>
+
+    <!-- Tableau des auteurs -->
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Date de naissance</th>
+        </tr>
+        </thead>
+        <tbody id="authors-list">
+        <!-- Liste des auteurs affichée ici -->
+        </tbody>
+    </table>
+
+    <!-- Gestion des auteurs -->
+    <div class="form-section">
+        <h2>Gestion des Livres</h2>
+        <form id="authors-form">
+            <label for="authors-id">ID :</label>
+            <input type="number" id="authors-id" placeholder="Entrez l'id de l'auteur..." required>
+
+            <label for="authors-name">Nom :</label>
+            <input type="text" id="authors-name" placeholder="Entrez le nom de l'auteur..." required>
+
+            <label for="authors-firstname">Prénom :</label>
+            <input type="text" id="authors-firstname" placeholder="Entrez le prénom de l'auteur..." required>
+
+            <label for="authors-date">Date de naissance</label>
+            <input type="date" id="authors-date" required>
+
+            <button type="submit">Ajouter</button>
+            <button type="submit">Modifier</button>
+            <button type="submit">Supprimer</button>
+            <button type="submit">Rechercher</button>
+            <button type="submit">Vider les champs</button>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

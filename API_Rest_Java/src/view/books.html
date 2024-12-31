@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Les livres</title>
+  <link rel="stylesheet" type="text/css" href="../style/style.css">
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <ul>
+        <li><a href="index.html">Accueil</a> </li>
+        <li><a href="authors.html">Auteurs</a></li>
+        <li><a href="books.html">Livres</a> </li>
+        <li><a href="subjects.html">Sujets</a> </li>
+      </ul>
+    </nav>
+    <!-- Titre de la page -->
+    <h2>Liste des Livres</h2>
+
+    <!-- Tableau des livres -->
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Titre</th>
+        <th>Auteur</th>
+        <th>Sujet</th>
+        <th>ISBN</th>
+        <th>Pages</th>
+        <th>Quantité en Stock</th>
+        <th>Prix</th>
+        <th>Année de Publication</th>
+      </tr>
+      </thead>
+      <tbody id="book-list">
+      <!-- Liste de livres affichée ici -->
+      </tbody>
+    </table>
+
+    <!-- Gestion des livres -->
+    <div class="form-section">
+      <h2>Gestion des Auteurs</h2>
+      <form id="book-form">
+        <label for="book-id">ID du Livre</label>
+        <input type="number" id="book-id" placeholder="Entrez l'id de livre..." required>
+
+        <label for="book-name">Nom du Livre</label>
+        <input type="text" id="book-name" placeholder="Entrez le nom du livre..." required>
+
+        <label for="book-author">Auteur</label>
+        <input type="text" id="book-author" placeholder="Entrez le nom de livre..." required>
+
+        <label for="book-subject">Sujet</label>
+        <select id="book-subject" required>
+          <option value="home"> Sélectionnez un sujet</option>
+          <option value="fiction">Fiction</option>
+          <option value="science">Science</option>
+          <option value="histoire">Histoire</option>
+          <option value="technologie">Technologie</option>
+          <option value="philosophie">Philosophie</option>
+          <option value="autre">Autre</option>
+        </select>
+
+        <label for="book-isbn">ISBN</label>
+        <input type="text" id="book-isbn" placeholder="Entrez l'ISBN du livre..." >
+
+        <label for="book-pages">Nombre de Pages</label>
+        <input type="number" id="book-pages" placeholder="Entrez le nombre de page..." >
+
+        <label for="book-stock">Quantité en Stock</label>
+        <input type="number" id="book-stock" placeholder="Entrez la quantité en stock disponible..." >
+
+        <label for="book-price">Prix</label>
+        <input type="number" id="book-price" step="0.01" placeholder="Entrez le prix du livre...">
+
+        <label for="book-year">Année de Publication</label>
+        <input type="number" id="book-year" placeholder="Entrez le nom de l'année de publication...">
+
+        <button type="submit">Ajouter</button>
+        <button type="submit">Modifier</button>
+        <button type="submit">Supprimer</button>
+        <button type="submit">Rechercher</button>
+        <button type="submit">Vider les champs</button>
+      </form>
+    </div>
+
+  </div>
+
+</body>
+</html>

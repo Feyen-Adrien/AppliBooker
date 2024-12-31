@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Les sujets</title>
+  <link rel="stylesheet" type="text/css" href="../style/style.css">
+</head>
+<body>
+<div class="container">
+  <nav>
+    <ul>
+      <li><a href="index.html">Accueil</a> </li>
+      <li><a href="authors.html">Auteurs</a></li>
+      <li><a href="books.html">Livres</a> </li>
+      <li><a href="subjects.html">Sujets</a> </li>
+    </ul>
+  </nav>
+  <!-- Titre de la page -->
+  <h2>Liste des Sujets</h2>
+
+  <!-- Tableau des sujets -->
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nom</th>
+    </tr>
+    </thead>
+    <tbody id="sujet-list">
+    <!-- Liste des sujets affichée ici -->
+    </tbody>
+  </table>
+
+  <!-- Gestion des sujets -->
+  <div class="form-section">
+    <h2>Gestion des Sujets</h2>
+    <form id="book-form">
+      <label for="sujet-id">ID du sujet</label>
+      <input type="number" id="sujet-id" placeholder="Entrez l'id du sujet...">
+
+      <label for="sujet-name">Nom du Livre</label>
+      <input type="text" id="sujet-name" placeholder="Entrez le nom du sujet..." >
+
+      <button type="submit">Ajouter</button>
+      <button type="submit">Modifier</button>
+      <button type="submit">Supprimer</button>
+      <button type="submit">Recherhcer</button>
+      <button type="submit">Vider les champs</button>
+    </form>
+  </div>
+
+</div>
+</body>
+</html>

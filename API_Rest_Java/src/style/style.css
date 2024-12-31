@@ -1,0 +1,104 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+/* Style du menu de navigation */
+nav {
+    background-color: #48459e;
+    padding: 15px;
+}
+
+nav ul {
+    list-style-type: nope;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline;
+    padding: 15px;
+    border-right: 3px solid#dddddd;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+.container {
+    width: 80%;
+    max-width: 1000px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h1, h2, h3 {
+    text-align: left;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #333;
+    color: white;
+}
+
+td {
+    background-color: #f9f9f9;
+}
+
+.form-section {
+    margin-top: 30px;
+    border-top: 2px solid #333;
+    padding-top: 20px;
+}
+
+.form-section label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+.form-section input, .form-section select {
+    width: 99%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-section button {
+    background-color: #504dae;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.form-section button:hover {
+    background-color: #3d3a85;
+}
