@@ -109,7 +109,7 @@ document.getElementById("delete").addEventListener("click",function (e){
         {
             console.log(this.response);
             videTable();
-            miseAJourTable();
+            miseAJourTable("");
             showPopup(this.responseText);
         }
         else if(this.readyState == 4)

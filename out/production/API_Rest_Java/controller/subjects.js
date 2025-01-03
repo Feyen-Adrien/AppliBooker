@@ -23,6 +23,7 @@ document.getElementById('add').addEventListener("click",function (e){
                 if(this.readyState == 4 && this.status ==201)
                 {
                     console.log(this.response);
+                    videTable();
                     miseAJourTable("");
                     showPopup(this.responseText);
 
@@ -60,6 +61,7 @@ document.getElementById('update').addEventListener("click",function (e){
         if(this.readyState == 4 && this.status == 200)
         {
             console.log(this.response);
+            videTable();
             miseAJourTable("");
             showPopup(this.responseText);
         }
@@ -106,7 +108,8 @@ document.getElementById("delete").addEventListener("click",function (e){
         if(this.readyState == 4 && this.status == 200)
         {
             console.log(this.response);
-            miseAJourTable();
+            videTable();
+            miseAJourTable("");
             showPopup(this.responseText);
         }
         else if(this.readyState == 4)
@@ -133,11 +136,13 @@ document.getElementById("delete").addEventListener("click",function (e){
 document.getElementById("clear").addEventListener("click",function (e){
    document.getElementById("sujet-id").value="";
    document.getElementById("sujet-name").value="";
+   videTable();
    miseAJourTable("");
 });
 //rechercher
 document.getElementById("search").addEventListener("click",function (e){
     e.preventDefault();
+    videTable();
     miseAJourTable(document.getElementById("sujet-name").value);
 });
 
@@ -174,6 +179,13 @@ function miseAJourTable(name)
     xhr.responseType = "json";
     xhr.send();
 }
+function videTable()
+{
+    var maTable = document.getElementById("sujet-list");
+    while (maTable.rows.length >= 1) {
+        maTable.deleteRow(-1);// supprimer dernière ligne
+    }
+}
 
 function ajouterLigne(id, nom)
 {
@@ -190,6 +202,11 @@ function ajouterLigne(id, nom)
     nouvelleLigne.appendChild(celluleNom);
     //Ajouter la nouvelle ligne
     tableSujets.appendChild(nouvelleLigne);
+    nouvelleLigne.addEventListener('click', function () {
+        // Remplir les champs avec les données de la ligne cliquée
+        document.getElementById('sujet-id').value = id;
+        document.getElementById('sujet-name').value = nom;
+    });
 }
 // pour le popup
 // Fonction pour afficher le popup

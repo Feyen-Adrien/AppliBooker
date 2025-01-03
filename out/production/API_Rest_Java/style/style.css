@@ -67,8 +67,11 @@ th {
 
 td {
     background-color: #f9f9f9;
+    cursor: pointer;
 }
-
+td:hover{
+    background-color: gray;
+}
 .form-section {
     margin-top: 30px;
     border-top: 2px solid #333;

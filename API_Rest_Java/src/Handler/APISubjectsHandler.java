@@ -26,11 +26,11 @@ public class APISubjectsHandler implements HttpHandler
         exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
         exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
         exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
-
         String requestMethod = exchange.getRequestMethod();
         if(requestMethod.equals("OPTIONS"))
         {
             exchange.sendResponseHeaders(200, -1);
+            System.out.println("hello");
         }
         // gestion des requetes
         else if(requestMethod.equalsIgnoreCase("GET"))
@@ -42,11 +42,8 @@ public class APISubjectsHandler implements HttpHandler
                 String name = queryParams.get("name");
                 System.out.println("Sujet rechercher : " + name);
                 try {
-                    System.out.println("ola");
                     String response = convertSubjectsToJson(name);
-                    System.out.println("aaaaa");
                     sendResponse(exchange,200,response);
-                    System.out.println("Reponse : " + response);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -75,10 +72,12 @@ public class APISubjectsHandler implements HttpHandler
 
             try {
                 addSubject(subject);
-                sendResponse(exchange,201, "Sujet ajouté avec succès !");
+                System.out.println("ddd");
+
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+            sendResponse(exchange,201, "Sujet ajouté");
 
         } else if (requestMethod.equalsIgnoreCase("PUT")) {
             System.out.println("PUT request received");
@@ -132,9 +131,8 @@ public class APISubjectsHandler implements HttpHandler
 
     private void sendResponse(HttpExchange exchange, int status, String response) throws IOException {
         System.out.println("Envoie de la réponse (" + status + "): " + response);
-        exchange.getResponseHeaders().add("Content-Type","text/plain");
-        exchange.getResponseHeaders().add("Content-Type","application/json");
-        exchange.sendResponseHeaders(status, response.length());
+
+        exchange.sendResponseHeaders(status, response.getBytes().length); // bien mettre getBytes sinon fonctionne pas
         OutputStream os = exchange.getResponseBody();
         os.write(response.getBytes());
         os.close();
@@ -181,7 +179,6 @@ public class APISubjectsHandler implements HttpHandler
         }
         Gson gson = new Gson();
         JsonArray jsonArray = gson.toJsonTree(subjects).getAsJsonArray();
-        System.out.println("ici");
         return gson.toJson(jsonArray);
     }
     private void addSubject(Subject subject) throws SQLException {
