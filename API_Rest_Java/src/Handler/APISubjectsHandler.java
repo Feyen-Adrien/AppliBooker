@@ -66,8 +66,6 @@ public class APISubjectsHandler implements HttpHandler
 
                 try {
                     addSubject(subject);
-                    System.out.println("ddd");
-
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -79,7 +77,9 @@ public class APISubjectsHandler implements HttpHandler
             }
 
 
-        } else if (requestMethod.equalsIgnoreCase("PUT")) {
+        }
+        else if (requestMethod.equalsIgnoreCase("PUT"))
+        {
             System.out.println("PUT request received");
             Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getQuery());
             if(queryParams.containsKey("id"))
@@ -95,7 +95,7 @@ public class APISubjectsHandler implements HttpHandler
                 if(subjectName != null && !subjectName.isEmpty())
                 {
                     try {
-                        updateBook(subject);
+                        updateSubject(subject);
                         sendResponse(exchange,200,"Sujet mis à jour");
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
@@ -112,7 +112,9 @@ public class APISubjectsHandler implements HttpHandler
                 sendResponse(exchange,404,"error update manque id");
             }
 
-        } else if (requestMethod.equalsIgnoreCase("DELETE")) {
+        }
+        else if (requestMethod.equalsIgnoreCase("DELETE"))
+        {
             System.out.println("DELETE request received");
             Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getQuery());
             if(queryParams.containsKey("id"))
@@ -121,7 +123,7 @@ public class APISubjectsHandler implements HttpHandler
                 System.out.println("Suppresion du sujet : " + id);
 
                 try {
-                    deleteBook(id);
+                    deleteSubject(id);
                     sendResponse(exchange,200,"Sujet supprimé");
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -192,10 +194,10 @@ public class APISubjectsHandler implements HttpHandler
     private void addSubject(Subject subject) throws SQLException {
         subjectDAO.addSubject(subject);
     }
-    private void updateBook(Subject subject) throws SQLException {
+    private void updateSubject(Subject subject) throws SQLException {
         subjectDAO.updateSubject(subject);
     }
-    private void deleteBook(int id) throws SQLException {
+    private void deleteSubject(int id) throws SQLException {
         subjectDAO.deleteSubject(id);
     }
 }

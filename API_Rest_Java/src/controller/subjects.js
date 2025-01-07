@@ -29,8 +29,7 @@ document.getElementById('add').addEventListener("click",function (e){
                     videTable();
                     miseAJourTable("");
                     showPopup(this.responseText);
-                    name.value="";
-                    id.value="";
+                    viderInput();
 
                 }
                 else if(this.readyState == 4)
@@ -70,6 +69,7 @@ document.getElementById('update').addEventListener("click",function (e){
             videTable();
             miseAJourTable("");
             showPopup(this.responseText);
+            viderInput();
         }
         else if(this.readyState == 4)
         {
@@ -80,14 +80,12 @@ document.getElementById('update').addEventListener("click",function (e){
     {
         if(name.value !=="")
         {
-            let url = "http://192.168.0.170:8081/subjects?id="+id;
+            let url = "http://localhost:8081/subjects?id="+id.value;
             xhr.open("PUT",url,true);
             xhr.responseType = "text";
             xhr.setRequestHeader("Content-Type","application/json");
-            let subjectData = { name : name}
+            let subjectData = { name : name.value}
             xhr.send(JSON.stringify(subjectData));
-            name.value="";
-            id.value="";
         }
         else
         {
@@ -117,6 +115,7 @@ document.getElementById("delete").addEventListener("click",function (e){
             videTable();
             miseAJourTable("");
             showPopup(this.responseText);
+            viderInput();
         }
         else if(this.readyState == 4)
         {
@@ -125,12 +124,10 @@ document.getElementById("delete").addEventListener("click",function (e){
     };
     if(id.value !== "")
     {
-        let url = "http://192.168.0.170:8081/subjects?id="+id;
+        let url = "http://localhost:8081/subjects?id="+id.value;
         xhr.open("DELETE",url,true);
         xhr.responseType = "text";
         xhr.send();
-        name.value="";
-        id.value="";
     }
     else
     {
@@ -141,23 +138,20 @@ document.getElementById("delete").addEventListener("click",function (e){
 //vider les champs
 document.getElementById("clear").addEventListener("click",function (e){
    resetFormErrors();
-    name.value="";
-    id.value="";
+   viderInput();
    videTable();
-   miseAJourTable("");
+   miseAJourTable();
 });
 //rechercher
 document.getElementById("search").addEventListener("click",function (e){
     e.preventDefault();
-    if(document.getElementById("sujet-id").value !== "" && once ===0)
+    if(once ===0)
     {
         showPopup("L'id n'est pas prise en compte lors des recherches.");
         once++
     }
     videTable();
-    miseAJourTable(document.getElementById("sujet-name").value);
-    name.value="";
-    id.value="";
+    miseAJourTable(name.value);
 });
 
 
@@ -200,6 +194,11 @@ function videTable()
     while (maTable.rows.length >= 1) {
         maTable.deleteRow(-1);// supprimer dernière ligne
     }
+}
+function viderInput()
+{
+    name.value="";
+    id.value="";
 }
 
 function ajouterLigne(id1, nom)

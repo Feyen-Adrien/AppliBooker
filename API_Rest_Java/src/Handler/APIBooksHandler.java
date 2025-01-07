@@ -45,14 +45,20 @@ public class APIBooksHandler implements HttpHandler
         {
             System.out.println("GET request received");
             Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getQuery());
+            System.out.println(exchange.getRequestURI().getQuery());
             String lastName="";
             String subject="";
             String title="";
-            String price="";
+            String price="0";
             if(queryParams.containsKey("lastName"))
             {
                 try {
-                    lastName = authorDAO.getAuthorById(Integer.parseInt(queryParams.get("last_name"))).getLastName();
+                    if(Integer.parseInt(queryParams.get("lastName"))>0)
+                    {
+                        lastName = authorDAO.getAuthorById(Integer.parseInt(queryParams.get("lastName"))).getLastName();
+                        System.out.println(lastName);
+                    }
+
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -60,7 +66,10 @@ public class APIBooksHandler implements HttpHandler
             if(queryParams.containsKey("subject"))
             {
                 try {
-                    subject = subjectDAO.getSubjectById(Integer.parseInt(queryParams.get("subject"))).getSubject_name();
+                    if(Integer.parseInt(queryParams.get("subject"))>0)
+                    {
+                        subject = subjectDAO.getSubjectById(Integer.parseInt(queryParams.get("subject"))).getSubject_name();
+                    }
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 };
@@ -73,14 +82,17 @@ public class APIBooksHandler implements HttpHandler
             {
                 price = queryParams.get("price");
             }
+            System.out.println("lastName: "+lastName + subject + title + price);
             try {
-                System.out.println("Critères = nom="+lastName+", titre ="+title+", sujet="+subject+", prix = <"+price);
+                System.out.println("Critères = nom="+lastName+", titre ="+title+", sujet="+subject+", prix =<"+price);
                 String response = convertBooksToJson(lastName,title,subject,price);
                 sendResponse(exchange,200, response);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        } else if (requestMethod.equalsIgnoreCase("POST")) {
+        }
+        else if (requestMethod.equalsIgnoreCase("POST"))
+        {
             System.out.println("POST request received");
             String requestBody = readRequestBody(exchange);
 
@@ -88,31 +100,15 @@ public class APIBooksHandler implements HttpHandler
             Gson gson = new Gson();
             JsonObject jsonObject= gson.fromJson(requestBody, JsonObject.class);
             int idAuthor = jsonObject.get("idAuthor").getAsInt();
-            Author a;
-            System.out.println(idAuthor);
-            try {
-                a = authorDAO.getAuthorById(idAuthor);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            Subject s;
             int idSubject = jsonObject.get("idSubject").getAsInt();
-            System.out.println(idSubject);
-            try {
-                s = subjectDAO.getSubjectById(idSubject);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-
             String title = jsonObject.get("title").getAsString();
-            System.out.println(title);
             String isbn = jsonObject.get("isbn").getAsString();
             int stockQuantity = jsonObject.get("stockQuantity").getAsInt();
             int pageCount = jsonObject.get("pageCount").getAsInt();
             float price = jsonObject.get("price").getAsFloat();
             int annee = jsonObject.get("year").getAsInt();
             System.out.println(idAuthor+";"+idSubject+";"+title+";"+isbn);
-            Book book= new Book(null,idAuthor,idSubject,title,isbn,pageCount,stockQuantity,price,annee,a.getLastName(),a.getFirstSurname(),s.getSubject_name());
+            Book book= new Book(null,idAuthor,idSubject,title,isbn,pageCount,stockQuantity,price,annee,null,null,null);
             try {
                 addBook(book);
             } catch (SQLException e) {
@@ -120,6 +116,68 @@ public class APIBooksHandler implements HttpHandler
             }
             String response = "Livre ajouté avec succès !";
             sendResponse(exchange,201, response);
+        }
+        else if (requestMethod.equalsIgnoreCase("PUT"))
+        {
+            System.out.println("PUT request received");
+            Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getQuery());
+            if(queryParams.containsKey("id"))
+            {
+                int id = Integer.parseInt(queryParams.get("id"));
+                System.out.println("Mise à jour du livre : " + id);
+                String requestBody = readRequestBody(exchange);
+                Gson gson = new Gson();
+                JsonObject jsonObject = gson.fromJson(requestBody, JsonObject.class);
+                int idAuthor = jsonObject.get("idAuthor").getAsInt();
+                int idSubject = jsonObject.get("idSubject").getAsInt();
+                String title = jsonObject.get("title").getAsString();
+                String isbn = jsonObject.get("isbn").getAsString();
+                int stockQuantity = jsonObject.get("stockQuantity").getAsInt();
+                int pageCount = jsonObject.get("pageCount").getAsInt();
+                float price = jsonObject.get("price").getAsFloat();
+                int annee = jsonObject.get("year").getAsInt();
+                System.out.println(idAuthor+";"+idSubject+";"+title+";"+isbn);
+                Book b = new Book(id,idAuthor,idSubject,title,isbn,pageCount,stockQuantity,price,annee,null,null,null);
+                if(idAuthor != -1 && idSubject != -1 && title != "" && isbn != "" && pageCount >0 && price >0.0 && annee >0)
+                {
+                    try {
+                        updateBook(b);
+                        sendResponse(exchange,200,"Livre mis à jour");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                else
+                {
+                    sendResponse(exchange,404,"error update des informations ont été perdues lors de la reception");
+                }
+
+            }
+            else
+            {
+                sendResponse(exchange,404,"error update manque id");
+            }
+        }
+        else if (requestMethod.equalsIgnoreCase("DELETE"))
+        {
+            System.out.println("DELETE request received");
+            Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getQuery());
+            if(queryParams.containsKey("id"))
+            {
+                int id = Integer.parseInt(queryParams.get("id"));
+                System.out.println("Suppresion du livre : " + id);
+
+                try {
+                    deleteBook(id);
+                    sendResponse(exchange,200,"livre supprimé");
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else
+            {
+                sendResponse(exchange,404,"error update");
+            }
 
         }
     }
@@ -164,7 +222,7 @@ public class APIBooksHandler implements HttpHandler
     }
 
     private String convertBooksToJson(String lastname,String title, String subject, String price) throws SQLException {
-        if(lastname.isEmpty() && title.isEmpty() && subject.isEmpty() && price.isEmpty())
+        if(lastname.isEmpty() && title.isEmpty() && subject.isEmpty() && price=="0")
         {
             books = bookDAO.getAllBooks();
         }
@@ -194,8 +252,8 @@ public class APIBooksHandler implements HttpHandler
     private void updateBook(Book book) throws SQLException {
         bookDAO.updateBook(book);
     }
-    private void deleteBook(Book book) throws SQLException {
-        bookDAO.deleteBookById(book.getId());
+    private void deleteBook(int id) throws SQLException {
+        bookDAO.deleteBookById(id);
     }
 }
 

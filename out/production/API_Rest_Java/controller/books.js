@@ -10,7 +10,7 @@ let price =document.getElementById("book-price");
 let annee =document.getElementById("book-year");
 document.addEventListener('DOMContentLoaded', function () {
     console.log("La page est prête !");
-    miseAJourTable();
+    miseAJourTable("","","","");
     miseAJourAuteur();
     miseAJourSujet();
 });
@@ -52,8 +52,8 @@ document.getElementById('add').addEventListener("click",function (e){
             if(isbn.value =="")
             {
                 err=1;
-                isbn.classList.add("error-input");
             }
+            isbn.classList.add("error-input");
         }
         if(qte.value =="")
         {
@@ -95,16 +95,9 @@ document.getElementById('add').addEventListener("click",function (e){
                 {
                     console.log(this);
                     videTable();
-                    miseAJourTable();
+                    miseAJourTable("","","","");
                     showPopup(this.responseText);
-                    idAuteur.value="-1";
-                    idSubject.value="-1";
-                    titre.value="";
-                    isbn.value="";
-                    qte.value="";
-                    nbPage.value="";
-                    price.value="";
-                    annee.value="";
+                    viderInput();
                 }
                 else if (this.readyState == 4)
                 {
@@ -130,7 +123,167 @@ document.getElementById('add').addEventListener("click",function (e){
             xhr.send(Body);
         }
     }
-})
+});
+document.getElementById('update').addEventListener("click",function(e){
+    e.preventDefault();
+    resetFormErrors();
+    let xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function ()
+    {
+        console.log(this);
+        if(this.readyState == 4 && this.status == 200)
+        {
+            console.log(this.response);
+            videTable();
+            miseAJourTable("","","","");
+            showPopup(this.responseText);
+            viderInput();
+
+        }
+        else if(this.readyState == 4)
+        {
+            alert("Une erreur est survenue...");
+        }
+    };
+    if(id.value != "")
+    {
+        if(idAuteur.value != "-1")
+        {
+            if(idSubject.value != "-1")
+            {
+                if(titre.value != "")
+                {
+                    if(isValidISBN(isbn.value))
+                    {
+                        if(qte.value !="" && parseInt(qte.value)>0)
+                        {
+                            if(nbPage.value != "" && parseInt(nbPage.value)>0)
+                            {
+                                if(price.value !="" && parseFloat(price.value)>0.0)
+                                {
+                                    if(annee.value !="" && parseInt(annee.value)>0)
+                                    {
+                                        let url = "http://localhost:8081/books?id="+id.value;
+                                        xhr.open("PUT",url,true);
+                                        xhr.responseType = "text";
+                                        xhr.setRequestHeader("Content-Type","application/json");
+                                        let bookData = {
+                                            idAuthor: idAuteur.value,
+                                            idSubject: idSubject.value,
+                                            title: titre.value,
+                                            isbn: isbn.value,
+                                            stockQuantity: qte.value,
+                                            pageCount: nbPage.value,
+                                            price: price.value,
+                                            year: annee.value,
+                                        };
+                                        xhr.send(JSON.stringify(bookData));
+                                    }
+                                    else
+                                    {
+                                        showPopup("Veuillez entrer un année(>0)");
+                                        annee.classList.add("input-error");
+                                    }
+                                }
+                                else
+                                {
+                                    showPopup("Veuillez entrer un prix(>0)");
+                                    price.classList.add("input-error");
+                                }
+                            }
+                            else
+                            {
+                                showPopup("Veuillez entrer le nombre de page(>0)");
+                                nbPage.classList.add("input-error");
+                            }
+                        }
+                        else
+                        {
+                            showPopup("Veuillez entrer une quantité de stock(>0)");
+                            qte.classList.add("input-error");
+                        }
+                    }
+                    else
+                    {
+                        showPopup("Format d'ISBN invalid");
+                        isbn.classList.add("input-error");
+                    }
+                }
+                else
+                {
+                    showPopup("Veuillez entrer un titre");
+                    titre.classList.add("input-error");
+                }
+            }
+            else
+            {
+                showPopup("Veuillez selectionner un sujet");
+                idSubject.classList.add("input-error");
+            }
+        }
+        else
+        {
+            showPopup("Veuillez selectionnr un auteur");
+            idAuteur.classList.add("input-error");
+        }
+    }
+    else
+    {
+        showPopup("Veuillez entrer un id de livre");
+        id.classList.add("input-error");
+    }
+});
+document.getElementById('delete').addEventListener("click",function (e){
+    e.preventDefault();
+    resetFormErrors();
+    let xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function ()
+    {
+        console.log(this);
+        if(this.readyState == 4 && this.status == 200)
+        {
+            console.log(this.response);
+            videTable();
+            miseAJourTable("","","","");
+            showPopup(this.responseText);
+            viderInput();
+        }
+        else if(this.readyState == 4)
+        {
+            alert("Une erreur est survenue...");
+        }
+    };
+    if(id.value !== "")
+    {
+        let url = "http://localhost:8081/books?id="+id.value;
+        xhr.open("DELETE",url,true);
+        xhr.responseType = "text";
+        xhr.send();
+    }
+    else
+    {
+        showPopup("Veuillez entrer un id !");
+        id.classList.add("input-error");
+    }
+});
+document.getElementById('search').addEventListener("click",function (e){
+    e.preventDefault();
+    if(once ===0)
+    {
+        showPopup("Lors des recherches les éléments suivants ne sont pas pris en compte : id,ISBN,Quantité en stock,nombre de pages et l'année de publication");
+        once++
+    }
+    videTable();
+    miseAJourTable(idAuteur.value,idSubject.value,titre.value,price.value);
+});
+document.getElementById('clear').addEventListener("click",function (e){
+    resetFormErrors();
+    viderInput();
+    videTable();
+    miseAJourTable("","","","")
+});
 
 
 
@@ -156,23 +309,22 @@ function miseAJourTable(idAuteur,idSujet,titre,prix)
         }
     }
     let url = "http://localhost:8081/books";
-    if(idAuteur !="")
+    if(idAuteur !=="")
     {
         url += "?lastName="+idAuteur;
     }
-    if(idSujet !="")
+    if(idSujet !=="")
     {
-        url += "?subject="+idSujet;
+        url += "&subject="+idSujet;
     }
-    if(titre !="")
+    if(titre !=="")
     {
-        url += "?title="+titre;
+        url += "&title="+titre;
     }
-    if(prix !="")
+    if(prix !=="")
     {
-        url += "?price="+prix;
+        url += "&price="+prix;
     }
-
     xhr.open("GET",url,true);
     xhr.responseType = "json";
     xhr.send();
@@ -233,6 +385,17 @@ function miseAJourSujet()
     xhr.open("GET","http://localhost:8081/subjects",true);
     xhr.responseType = "json";
     xhr.send();
+}
+function viderInput()
+{
+    idAuteur.value="-1";
+    idSubject.value="-1";
+    titre.value="";
+    isbn.value="";
+    qte.value="";
+    nbPage.value="";
+    price.value="";
+    annee.value="";
 }
 
 
