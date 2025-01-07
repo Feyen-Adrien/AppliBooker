@@ -282,7 +282,7 @@ document.getElementById('clear').addEventListener("click",function (e){
     resetFormErrors();
     viderInput();
     videTable();
-    miseAJourTable("","","","")
+    miseAJourTable("","","","");
 });
 
 
@@ -308,10 +308,10 @@ function miseAJourTable(idAuteur,idSujet,titre,prix)
             alert("Une erreur est survenue...");
         }
     }
-    let url = "http://localhost:8081/books";
+    let url = "http://localhost:8081/books?";
     if(idAuteur !=="")
     {
-        url += "?lastName="+idAuteur;
+        url += "idauteur="+idAuteur;
     }
     if(idSujet !=="")
     {

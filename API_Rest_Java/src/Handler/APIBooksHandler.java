@@ -50,12 +50,12 @@ public class APIBooksHandler implements HttpHandler
             String subject="";
             String title="";
             String price="0";
-            if(queryParams.containsKey("lastName"))
+            if(queryParams.containsKey("idauteur"))
             {
                 try {
-                    if(Integer.parseInt(queryParams.get("lastName"))>0)
+                    if(Integer.parseInt(queryParams.get("idauteur"))>0)
                     {
-                        lastName = authorDAO.getAuthorById(Integer.parseInt(queryParams.get("lastName"))).getLastName();
+                        lastName = authorDAO.getAuthorById(Integer.parseInt(queryParams.get("idauteur"))).getLastName();
                         System.out.println(lastName);
                     }
 

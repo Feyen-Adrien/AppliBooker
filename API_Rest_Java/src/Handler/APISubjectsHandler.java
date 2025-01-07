@@ -43,7 +43,6 @@ public class APISubjectsHandler implements HttpHandler
             {
                 name = queryParams.get("name");
                 System.out.println("Sujet rechercher : " + name);
-
             }
             try {
                 String response = convertSubjectsToJson(name);

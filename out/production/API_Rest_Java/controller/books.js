@@ -55,22 +55,22 @@ document.getElementById('add').addEventListener("click",function (e){
             }
             isbn.classList.add("error-input");
         }
-        if(qte.value =="")
+        if(qte.value =="" || parseInt(qte.value) <=0)
         {
             qte.classList.add("input-error");
             err=1;
         }
-        if(nbPage.value =="")
+        if(nbPage.value =="" || parseInt(nbPage.value) <=0)
         {
             nbPage.classList.add("input-error");
             err=1;
         }
-        if(price.value =="")
+        if(price.value =="" || parseInt(price.value) <=0)
         {
             price.classList.add("input-error");
             err=1;
         }
-        if(annee.value =="")
+        if(annee.value =="" || parseInt(annee.value) <=0)
         {
             annee.classList.add("input-error");
             err=1;
@@ -81,7 +81,7 @@ document.getElementById('add').addEventListener("click",function (e){
         }
         if(err==1)
         {
-            showPopup("Veuillez indiquer des valeurs aux endroits rouges");
+            showPopup("Veuillez indiquer(>0 pour prix, quantité stock, pages et année) des valeurs aux endroits rouges");
         }
 
 
@@ -282,7 +282,7 @@ document.getElementById('clear').addEventListener("click",function (e){
     resetFormErrors();
     viderInput();
     videTable();
-    miseAJourTable("","","","")
+    miseAJourTable("","","","");
 });
 
 
@@ -308,10 +308,10 @@ function miseAJourTable(idAuteur,idSujet,titre,prix)
             alert("Une erreur est survenue...");
         }
     }
-    let url = "http://localhost:8081/books";
+    let url = "http://localhost:8081/books?";
     if(idAuteur !=="")
     {
-        url += "?lastName="+idAuteur;
+        url += "idauteur="+idAuteur;
     }
     if(idSujet !=="")
     {
