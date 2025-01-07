@@ -15,9 +15,9 @@ import java.util.List;
 public class SubjectsHandler implements HttpHandler
 {
     public SubjectDAO subjectDAO = SubjectDAO.getInstance();
-    private final String HTML_FILE_PATH = "D:\\HEPL_3_2024-2025\\Reseaux_Technologie_Internet\\Labo\\AppliBooker\\API_Rest_Java\\src\\view\\subjects.html";
-    private final String CSS_FILE_PATH = "D:\\HEPL_3_2024-2025\\Reseaux_Technologie_Internet\\Labo\\AppliBooker\\API_Rest_Java\\src\\style\\style.css";
-    private final String JS_FILE_PATH = "D:\\HEPL_3_2024-2025\\Reseaux_Technologie_Internet\\Labo\\AppliBooker\\API_Rest_Java\\src\\controller\\subjects.js";
+    private final String HTML_FILE_PATH = ".\\API_Rest_Java\\src\\view\\subjects.html";
+    private final String CSS_FILE_PATH = ".\\API_Rest_Java\\src\\style\\style.css";
+    private final String JS_FILE_PATH = ".\\API_Rest_Java\\src\\controller\\subjects.js";
     @Override
     public void handle(HttpExchange exchange) throws IOException
     {

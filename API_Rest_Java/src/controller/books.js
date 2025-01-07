@@ -1,62 +1,141 @@
-(function() {
-    console.log("Ceci est une fonction auto-exécutante !");
+let once =0;
+let id=document.getElementById("book-id");
+let idAuteur=document.getElementById("book-author");
+let idSubject =document.getElementById("book-subject");
+let titre=document.getElementById("book-name");
+let isbn=document.getElementById("book-isbn");
+let qte=document.getElementById("book-stock");
+let nbPage =document.getElementById("book-pages");
+let price =document.getElementById("book-price");
+let annee =document.getElementById("book-year");
+document.addEventListener('DOMContentLoaded', function () {
+    console.log("La page est prête !");
     miseAJourTable();
-    miseAJourSujet();
     miseAJourAuteur();
-})();
+    miseAJourSujet();
+});
 // Boutton Ajouter
 document.getElementById('add').addEventListener("click",function (e){
-    let xhr = new XMLHttpRequest();
-
-    xhr.onreadystatechange = function ()
+    e.preventDefault();
+    resetFormErrors();
+    if(id.value != null && id.value != "")
     {
-        console.log(this)
-        if(this.readyState == 4 && this.status ==201)
-        {
-            console.log(this);
-            miseAJourTable();
-            showPopup(this.responseText);
-        }
-        else if (this.readyState == 4)
-        {
-            alert("Une erruer est survenue...");
-        }
-
-    };
-
-
-
-    if(document.getElementById('book-id').value != -1)
-    {
-        showPopup("Veuillez ne pas entrer d'id lors de l'ajout d'un livre !")
+        showPopup("Veuillez ne pas entrer d'id lors de l'ajout d'un livre !");
+        id.classList.add("input-error");
     }
     else
     {
-        xhr.open("POST","http://localhost:8081/books",true);
-        xhr.responseType = "text";
-        xhr.setRequestHeader("Content-type", "application/JSON");
-        let bookData = {
-            idBook : null,
-            idAuthor: document.getElementById('book-author').value,
-            idSubject: document.getElementById('book-subject').value,
-            title: document.getElementById('book-name').value,
-            isbn: document.getElementById('book-isbn').value,
-            pageCount: document.getElementById('book-pages').value,
-            stockQuantity: document.getElementById('book-stock').value,
-            price: document.getElementById('book-price').value,
-            year: document.getElementById('book-year').value,
-        };
-        let Body = JSON.stringify(bookData);//transforme en JSON
+        let err = 0;
+        let err2 = 0;
+        if(idAuteur.value =="-1")
+        {
+            idAuteur.classList.add("input-error");
+            err=1;
+        }
+        if(idSubject.value =="-1")
+        {
+            idSubject.classList.add("input-error");
+            err=1;
+        }
+        if(titre.value =="")
+        {
+            titre.classList.add("input-error");
+            err=1;
+        }
+        if(isValidISBN(isbn.value)==false)
+        {
+            isbn.classList.add("input-error");
+            err2=1;
+        }
+        else
+        {
+            if(isbn.value =="")
+            {
+                err=1;
+                isbn.classList.add("error-input");
+            }
+        }
+        if(qte.value =="")
+        {
+            qte.classList.add("input-error");
+            err=1;
+        }
+        if(nbPage.value =="")
+        {
+            nbPage.classList.add("input-error");
+            err=1;
+        }
+        if(price.value =="")
+        {
+            price.classList.add("input-error");
+            err=1;
+        }
+        if(annee.value =="")
+        {
+            annee.classList.add("input-error");
+            err=1;
+        }
+        if(err2==1)
+        {
+            showPopup("Veuilllez respecter le format ISBN (13 chiffres) : XXX-XXXXXXXXXX")
+        }
+        if(err==1)
+        {
+            showPopup("Veuillez indiquer des valeurs aux endroits rouges");
+        }
 
-        xhr.send(Body);
+
+        if(err==0 && err2 ==0)
+        {
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function ()
+            {
+                console.log(this)
+                if(this.readyState == 4 && this.status ==201)
+                {
+                    console.log(this);
+                    videTable();
+                    miseAJourTable();
+                    showPopup(this.responseText);
+                    idAuteur.value="-1";
+                    idSubject.value="-1";
+                    titre.value="";
+                    isbn.value="";
+                    qte.value="";
+                    nbPage.value="";
+                    price.value="";
+                    annee.value="";
+                }
+                else if (this.readyState == 4)
+                {
+                    alert("Une erruer est survenue...");
+                }
+
+            };
+            xhr.open("POST","http://localhost:8081/books",true);
+            xhr.responseType = "text";
+            xhr.setRequestHeader("Content-type", "application/JSON");
+            let bookData = {
+                idAuthor: idAuteur.value,
+                idSubject: idSubject.value,
+                title: titre.value,
+                isbn: isbn.value,
+                stockQuantity: qte.value,
+                pageCount: nbPage.value,
+                price: price.value,
+                year: annee.value,
+            };
+            let Body = JSON.stringify(bookData);//transforme en JSON
+
+            xhr.send(Body);
+        }
     }
-
 })
 
 
 
 // fonction utile
-function miseAJourTable()
+function miseAJourTable(idAuteur,idSujet,titre,prix)
 {
     let xhr = new XMLHttpRequest();
 
@@ -76,10 +155,34 @@ function miseAJourTable()
             alert("Une erreur est survenue...");
         }
     }
+    let url = "http://localhost:8081/books";
+    if(idAuteur !="")
+    {
+        url += "?lastName="+idAuteur;
+    }
+    if(idSujet !="")
+    {
+        url += "?subject="+idSujet;
+    }
+    if(titre !="")
+    {
+        url += "?title="+titre;
+    }
+    if(prix !="")
+    {
+        url += "?price="+prix;
+    }
 
-    xhr.open("GET","http://localhost:8081/books",true);
+    xhr.open("GET",url,true);
     xhr.responseType = "json";
     xhr.send();
+}
+function videTable()
+{
+    var maTable = document.getElementById("book-list");
+    while (maTable.rows.length >= 1) {
+        maTable.deleteRow(-1);// supprimer dernière ligne
+    }
 }
 function miseAJourAuteur()
 {
@@ -133,16 +236,16 @@ function miseAJourSujet()
 }
 
 
-function ajouterLigne(id,titre,auteur,sujet, ISBN, pages, qte,prix, annee)
+function ajouterLigne(ide,titre1,auteur,sujet, ISBN, pages, qte1,prix, annee1)
 {
     let tableLivre = document.getElementById("book-list");
     // créer un nouvelle ligne
     let nouvelleLigne = document.createElement("tr");
     // créer les cellules
     celluleId = document.createElement("td");
-    celluleId.textContent = id;
+    celluleId.textContent = ide;
     celluleTitre = document.createElement("td");
-    celluleTitre.textContent = titre;
+    celluleTitre.textContent = titre1;
     celluleAuteur = document.createElement("td");
     celluleAuteur.textContent = auteur;
     celluleSujet = document.createElement("td");
@@ -152,11 +255,11 @@ function ajouterLigne(id,titre,auteur,sujet, ISBN, pages, qte,prix, annee)
     cellulePages = document.createElement("td");
     cellulePages.textContent = pages;
     celluleQte = document.createElement("td");
-    celluleQte.textContent = qte;
+    celluleQte.textContent = qte1;
     cellulePrix = document.createElement("td");
     cellulePrix.textContent = prix;
     celluleAnnee = document.createElement("td");
-    celluleAnnee.textContent = annee;
+    celluleAnnee.textContent = annee1;
     // Ajouter les cellules à la lignes
     nouvelleLigne.appendChild(celluleId);
     nouvelleLigne.appendChild(celluleTitre);
@@ -167,8 +270,22 @@ function ajouterLigne(id,titre,auteur,sujet, ISBN, pages, qte,prix, annee)
     nouvelleLigne.appendChild(celluleQte);
     nouvelleLigne.appendChild(cellulePrix);
     nouvelleLigne.appendChild(celluleAnnee);
+    //Ajout Listener pour être selectionnable
+    nouvelleLigne.addEventListener('click', function () {
+        // Remplir les champs avec les données de la ligne cliquée
+        id.value = ide;
+        idAuteur.value = getValueByText(idAuteur,auteur);
+        idSubject.value = getValueByText(idSubject,sujet);
+        titre.value = titre1;
+        isbn.value = ISBN;
+        nbPage.value = pages;
+        qte.value = qte1;
+        price.value =prix;
+        annee.value = annee1;
+    });
     //Ajouter la nouvelle ligne
     tableLivre.appendChild(nouvelleLigne);
+
 }
 // pour afficher les différents auteurs et sujets(liste déroulantes)
 function ajouterAuteur(idAuteur,AuteurNom, AuteurPrenom)
@@ -203,6 +320,37 @@ function closePopup() {
     const popup = document.getElementById('popup');
     popup.style.display = 'none'; // Cacher le popup
 }
-
 // Écouteur d'événement pour fermer le popup lorsqu'on clique sur la croix
 document.getElementById('popup-close').addEventListener('click', closePopup);
+
+// Fonction pour réinitialiser les erreurs du formulaire
+function resetFormErrors() {
+    // Supprimer les bordures rouges des champs
+    id.classList.remove('input-error');
+    idAuteur.classList.remove('input-error');
+    idSubject.classList.remove('input-error');
+    titre.classList.remove('input-error');
+    isbn.classList.remove('input-error');
+    qte.classList.remove('input-error');
+    nbPage.classList.remove('input-error');
+    price.classList.remove('input-error');
+    annee.classList.remove('input-error');
+}
+function isValidISBN(isbn) {
+    // Expression régulière pour vérifier le format "XXX-XXXXXXXXXX"
+    const regex = /^\d{3}-\d{10}$/;
+
+    // Teste le format de l'ISBN
+    return regex.test(isbn);
+}
+function getValueByText(select,text) {
+    let options = select.options; // Récupère toutes les options du <select>
+
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].text === text) {
+            return options[i].value;  // Retourne la valeur de l'option
+        }
+    }
+    return null;  // Si le texte n'a pas été trouvé, retourne null
+}
+

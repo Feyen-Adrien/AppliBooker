@@ -11,7 +11,9 @@ import model.entity.Author;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class APIAuthorsHandler implements HttpHandler
 {
@@ -58,7 +60,8 @@ public class APIAuthorsHandler implements HttpHandler
 
     private void sendResponse(HttpExchange exchange, int status, String response) throws IOException {
         System.out.println("Envoie de la réponse (" + status + "): " + response);
-        exchange.sendResponseHeaders(status, response.length());
+
+        exchange.sendResponseHeaders(status, response.getBytes().length); // bien mettre getBytes sinon fonctionne pas
         OutputStream os = exchange.getResponseBody();
         os.write(response.getBytes());
         os.close();
@@ -73,6 +76,23 @@ public class APIAuthorsHandler implements HttpHandler
         }
         br.close();
         return sb.toString();
+    }
+    private static Map<String, String> parseQueryParams(String query)
+    {
+        Map<String, String> queryParams = new HashMap<>();
+        if (query != null)
+        {
+            String[] params = query.split("&");
+            for (String param : params)
+            {
+                String[] keyValue = param.split("=");
+                if (keyValue.length == 2)
+                {
+                    queryParams.put(keyValue[0], keyValue[1]);
+                }
+            }
+        }
+        return queryParams;
     }
 
     private String convertAuthorsToJson() throws SQLException {

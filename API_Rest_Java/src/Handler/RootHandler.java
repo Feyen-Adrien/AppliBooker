@@ -11,8 +11,8 @@ import java.nio.file.Paths;
 
 public class RootHandler implements HttpHandler {
 
-    private static final String HTML_FILE_PATH = "D:\\HEPL_3_2024-2025\\Reseaux_Technologie_Internet\\Labo\\AppliBooker\\API_Rest_Java\\src\\view\\index.html";
-    private static final String CSS_FILE_PATH = "D:\\HEPL_3_2024-2025\\Reseaux_Technologie_Internet\\Labo\\AppliBooker\\API_Rest_Java\\src\\style\\style.css";
+    private static final String HTML_FILE_PATH = ".\\API_Rest_Java\\src\\view\\index.html";
+    private static final String CSS_FILE_PATH = ".\\API_Rest_Java\\src\\style\\style.css";
 
 
 

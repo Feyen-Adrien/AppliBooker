@@ -8,12 +8,17 @@ import com.sun.net.httpserver.*;
 import model.dao.AuthorDAO;
 import model.dao.BookDAO;
 import model.dao.SubjectDAO;
+import model.entity.Author;
 import model.entity.Book;
+import model.entity.Subject;
+import model.viewmodel.BookSearchVM;
 
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class APIBooksHandler implements HttpHandler
 {
@@ -27,15 +32,50 @@ public class APIBooksHandler implements HttpHandler
         // pour travaille sur 2 ports différents
         exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
         exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content Type");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
 
         String requestMethod = exchange.getRequestMethod();
         // gestion des requetes
-        if(requestMethod.equalsIgnoreCase("GET"))
+        if(requestMethod.equals("OPTIONS"))
+        {
+            exchange.sendResponseHeaders(200, -1);
+            System.out.println("hello");
+        }
+        else if(requestMethod.equalsIgnoreCase("GET"))
         {
             System.out.println("GET request received");
+            Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getQuery());
+            String lastName="";
+            String subject="";
+            String title="";
+            String price="";
+            if(queryParams.containsKey("lastName"))
+            {
+                try {
+                    lastName = authorDAO.getAuthorById(Integer.parseInt(queryParams.get("last_name"))).getLastName();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if(queryParams.containsKey("subject"))
+            {
+                try {
+                    subject = subjectDAO.getSubjectById(Integer.parseInt(queryParams.get("subject"))).getSubject_name();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                };
+            }
+            if(queryParams.containsKey("title"))
+            {
+                title = queryParams.get("title");
+            }
+            if(queryParams.containsKey("price"))
+            {
+                price = queryParams.get("price");
+            }
             try {
-                String response = convertBooksToJson();
+                System.out.println("Critères = nom="+lastName+", titre ="+title+", sujet="+subject+", prix = <"+price);
+                String response = convertBooksToJson(lastName,title,subject,price);
                 sendResponse(exchange,200, response);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -46,7 +86,33 @@ public class APIBooksHandler implements HttpHandler
 
             //transforme en JSON
             Gson gson = new Gson();
-            Book book = gson.fromJson(requestBody, Book.class);
+            JsonObject jsonObject= gson.fromJson(requestBody, JsonObject.class);
+            int idAuthor = jsonObject.get("idAuthor").getAsInt();
+            Author a;
+            System.out.println(idAuthor);
+            try {
+                a = authorDAO.getAuthorById(idAuthor);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            Subject s;
+            int idSubject = jsonObject.get("idSubject").getAsInt();
+            System.out.println(idSubject);
+            try {
+                s = subjectDAO.getSubjectById(idSubject);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            String title = jsonObject.get("title").getAsString();
+            System.out.println(title);
+            String isbn = jsonObject.get("isbn").getAsString();
+            int stockQuantity = jsonObject.get("stockQuantity").getAsInt();
+            int pageCount = jsonObject.get("pageCount").getAsInt();
+            float price = jsonObject.get("price").getAsFloat();
+            int annee = jsonObject.get("year").getAsInt();
+            System.out.println(idAuthor+";"+idSubject+";"+title+";"+isbn);
+            Book book= new Book(null,idAuthor,idSubject,title,isbn,pageCount,stockQuantity,price,annee,a.getLastName(),a.getFirstSurname(),s.getSubject_name());
             try {
                 addBook(book);
             } catch (SQLException e) {
@@ -62,7 +128,8 @@ public class APIBooksHandler implements HttpHandler
 
     private void sendResponse(HttpExchange exchange, int status, String response) throws IOException {
         System.out.println("Envoie de la réponse (" + status + "): " + response);
-        exchange.sendResponseHeaders(status, response.length());
+
+        exchange.sendResponseHeaders(status, response.getBytes().length); // bien mettre getBytes sinon fonctionne pas
         OutputStream os = exchange.getResponseBody();
         os.write(response.getBytes());
         os.close();
@@ -78,9 +145,34 @@ public class APIBooksHandler implements HttpHandler
         br.close();
         return sb.toString();
     }
+    private static Map<String, String> parseQueryParams(String query)
+    {
+        Map<String, String> queryParams = new HashMap<>();
+        if (query != null)
+        {
+            String[] params = query.split("&");
+            for (String param : params)
+            {
+                String[] keyValue = param.split("=");
+                if (keyValue.length == 2)
+                {
+                    queryParams.put(keyValue[0], keyValue[1]);
+                }
+            }
+        }
+        return queryParams;
+    }
 
-    private String convertBooksToJson() throws SQLException {
-        books = bookDAO.getAllBooks();
+    private String convertBooksToJson(String lastname,String title, String subject, String price) throws SQLException {
+        if(lastname.isEmpty() && title.isEmpty() && subject.isEmpty() && price.isEmpty())
+        {
+            books = bookDAO.getAllBooks();
+        }
+        else
+        {
+            BookSearchVM b = new BookSearchVM(lastname,title,subject,Double.parseDouble(price));
+            books = bookDAO.serchBooks(b);
+        }
         Gson gson = new Gson();
         JsonArray jsonArray = gson.toJsonTree(books).getAsJsonArray();
         int i=0;

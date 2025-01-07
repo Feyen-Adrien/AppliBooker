@@ -64,13 +64,13 @@ th {
     background-color: #333;
     color: white;
 }
-
-td {
+tr{
     background-color: #f9f9f9;
-    cursor: pointer;
+
 }
-td:hover{
+tr:hover{
     background-color: gray;
+    cursor: pointer;
 }
 .form-section {
     margin-top: 30px;
@@ -141,4 +141,10 @@ td:hover{
 }
 .popup-close:hover{
     color: red;
+}
+
+/* Classe pour les champs en erreur */
+.input-error {
+    border: 2px solid red !important; /* Bordure rouge */
+    background-color: #fdd !important; /* Fond léger pour attirer l'attention */
 }

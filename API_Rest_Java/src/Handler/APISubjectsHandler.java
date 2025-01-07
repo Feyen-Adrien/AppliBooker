@@ -26,6 +26,7 @@ public class APISubjectsHandler implements HttpHandler
         exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
         exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
         exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+
         String requestMethod = exchange.getRequestMethod();
         if(requestMethod.equals("OPTIONS"))
         {
@@ -37,28 +38,19 @@ public class APISubjectsHandler implements HttpHandler
         {
             System.out.println("GET request received");
             Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getQuery());
+            String name="";
             if(queryParams.containsKey("name"))
             {
-                String name = queryParams.get("name");
+                name = queryParams.get("name");
                 System.out.println("Sujet rechercher : " + name);
-                try {
-                    String response = convertSubjectsToJson(name);
-                    sendResponse(exchange,200,response);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            else
-            {
-                try {
-                    String response = convertSubjectsToJson("");
-                    sendResponse(exchange,200, response);
-                    System.out.println("Reponse : " + response);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
 
+            }
+            try {
+                String response = convertSubjectsToJson(name);
+                sendResponse(exchange,200,response);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
         else if (requestMethod.equalsIgnoreCase("POST"))
         {
@@ -68,16 +60,24 @@ public class APISubjectsHandler implements HttpHandler
             JsonObject jsonObject = gson.fromJson(requestBody, JsonObject.class);
             String subjectName = jsonObject.get("name").getAsString();
             System.out.println("Request Body: " + subjectName);
-            Subject subject = new Subject(null, subjectName);
+            if(subjectName != null && !subjectName.isEmpty())
+            {
+                Subject subject = new Subject(null, subjectName);
 
-            try {
-                addSubject(subject);
-                System.out.println("ddd");
+                try {
+                    addSubject(subject);
+                    System.out.println("ddd");
 
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                sendResponse(exchange,201, "Sujet ajouté");
             }
-            sendResponse(exchange,201, "Sujet ajouté");
+            else
+            {
+                sendResponse(exchange,404, "Manque de données lors de l'ajout");
+            }
+
 
         } else if (requestMethod.equalsIgnoreCase("PUT")) {
             System.out.println("PUT request received");
@@ -92,16 +92,24 @@ public class APISubjectsHandler implements HttpHandler
                 String subjectName = jsonObject.get("name").getAsString();
                 System.out.println("Request Body: " + subjectName);
                 Subject subject = new Subject(id, subjectName);
-                try {
-                    updateBook(subject);
-                    sendResponse(exchange,200,"Sujet mis à jour");
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                if(subjectName != null && !subjectName.isEmpty())
+                {
+                    try {
+                        updateBook(subject);
+                        sendResponse(exchange,200,"Sujet mis à jour");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
+                else
+                {
+                    sendResponse(exchange,404,"error update manque nom du sujet");
+                }
+
             }
             else
             {
-                sendResponse(exchange,404,"error update");
+                sendResponse(exchange,404,"error update manque id");
             }
 
         } else if (requestMethod.equalsIgnoreCase("DELETE")) {

@@ -1,3 +1,6 @@
+let once = 0;
+let id = document.getElementById('sujet-id');
+let name = document.getElementById('sujet-name');
 document.addEventListener('DOMContentLoaded', function () {
     console.log("La page est prête !");
     miseAJourTable("");
@@ -5,18 +8,18 @@ document.addEventListener('DOMContentLoaded', function () {
 // Boutton Ajouter
 document.getElementById('add').addEventListener("click",function (e){
     e.preventDefault();
-    let id = document.getElementById('sujet-id').value;
-    if(id != null && id != "")
+    resetFormErrors();
+    if(id.value != null && id.value != "")
     {
         showPopup("Veuillez ne pas entrer d'id lors de l'ajout d'un sujet !");
+        id.classList.add("input-error");
     }
     else
     {
-        let name = document.getElementById('sujet-name').value;
-        if(name !== "")
+
+        if(name.value !== "")
         {
             let xhr = new XMLHttpRequest();
-
             xhr.onreadystatechange = function ()
             {
                 console.log(this)
@@ -26,6 +29,8 @@ document.getElementById('add').addEventListener("click",function (e){
                     videTable();
                     miseAJourTable("");
                     showPopup(this.responseText);
+                    name.value="";
+                    id.value="";
 
                 }
                 else if(this.readyState == 4)
@@ -39,20 +44,21 @@ document.getElementById('add').addEventListener("click",function (e){
             xhr.responseType = "text";
             xhr.setRequestHeader("Content-Type", "application/json");
 
-            let subjectData = { name : name}
+            let subjectData = { name : name.value};
             xhr.send(JSON.stringify(subjectData));
-            document.getElementById("sujet-id").value="";
-            document.getElementById('sujet-name').value="";
+
         }
         else
         {
-            showPopup("Veuillez entrer un nom de sujet !")
+            showPopup("Veuillez entrer un nom de sujet !");
+            name.classList.add("input-error");
         }
     }
 });
 // modifier
 document.getElementById('update').addEventListener("click",function (e){
     e.preventDefault();
+    resetFormErrors()
     let xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = function ()
@@ -70,11 +76,9 @@ document.getElementById('update').addEventListener("click",function (e){
             alert("Une erreur est survenue...");
         }
     };
-    let id = document.getElementById("sujet-id").value;
-    if(id !== "")
+    if(id.value !== "")
     {
-        let name = document.getElementById("sujet-name").value;
-        if(name !=="")
+        if(name.value !=="")
         {
             let url = "http://192.168.0.170:8081/subjects?id="+id;
             xhr.open("PUT",url,true);
@@ -82,24 +86,26 @@ document.getElementById('update').addEventListener("click",function (e){
             xhr.setRequestHeader("Content-Type","application/json");
             let subjectData = { name : name}
             xhr.send(JSON.stringify(subjectData));
-            document.getElementById("sujet-id").value="";
-            document.getElementById('sujet-name').value="";
+            name.value="";
+            id.value="";
         }
         else
         {
             showPopup("Veuillez entrez un nom de sujet !");
+            name.classList.add("input-error");
         }
     }
     else
     {
         showPopup("Veuillez entrer un id !");
+        id.classList.add("input-error");
     }
 
 });
 // supprimer
 document.getElementById("delete").addEventListener("click",function (e){
     e.preventDefault();
-
+    resetFormErrors();
     let xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = function ()
@@ -117,33 +123,41 @@ document.getElementById("delete").addEventListener("click",function (e){
             alert("Une erreur est survenue...");
         }
     };
-    let id = document.getElementById("sujet-id").value;
-    if(id !== "")
+    if(id.value !== "")
     {
         let url = "http://192.168.0.170:8081/subjects?id="+id;
         xhr.open("DELETE",url,true);
         xhr.responseType = "text";
         xhr.send();
-        document.getElementById("sujet-id").value="";
-        document.getElementById('sujet-name').value="";
+        name.value="";
+        id.value="";
     }
     else
     {
-        showPopup("Veuillez entrer un id !")
+        showPopup("Veuillez entrer un id !");
+        id.classList.add("input-error");
     }
 });
 //vider les champs
 document.getElementById("clear").addEventListener("click",function (e){
-   document.getElementById("sujet-id").value="";
-   document.getElementById("sujet-name").value="";
+   resetFormErrors();
+    name.value="";
+    id.value="";
    videTable();
    miseAJourTable("");
 });
 //rechercher
 document.getElementById("search").addEventListener("click",function (e){
     e.preventDefault();
+    if(document.getElementById("sujet-id").value !== "" && once ===0)
+    {
+        showPopup("L'id n'est pas prise en compte lors des recherches.");
+        once++
+    }
     videTable();
     miseAJourTable(document.getElementById("sujet-name").value);
+    name.value="";
+    id.value="";
 });
 
 
@@ -170,11 +184,12 @@ function miseAJourTable(name)
             alert("Une erreur est survenue...");
         }
     }
-    let url = "http://192.168.0.170:8081/subjects";
+    let url = "http://localhost:8081/subjects";
     if(name != "")
     {
         url += "?name="+name;
     }
+
     xhr.open("GET",url,true);
     xhr.responseType = "json";
     xhr.send();
@@ -187,14 +202,14 @@ function videTable()
     }
 }
 
-function ajouterLigne(id, nom)
+function ajouterLigne(id1, nom)
 {
     let tableSujets = document.getElementById("sujet-list");
     // créer un nouvelle ligne
     let nouvelleLigne = document.createElement("tr");
     // créer les cellules
     let celluleId = document.createElement("td");
-    celluleId.textContent = id;
+    celluleId.textContent = id1;
     let celluleNom = document.createElement("td");
     celluleNom.textContent = nom;
     // Ajouter les cellules à la lignes
@@ -204,8 +219,8 @@ function ajouterLigne(id, nom)
     tableSujets.appendChild(nouvelleLigne);
     nouvelleLigne.addEventListener('click', function () {
         // Remplir les champs avec les données de la ligne cliquée
-        document.getElementById('sujet-id').value = id;
-        document.getElementById('sujet-name').value = nom;
+        id.value = id1;
+        name.value = nom;
     });
 }
 // pour le popup
@@ -225,3 +240,10 @@ function closePopup() {
 
 // Écouteur d'événement pour fermer le popup lorsqu'on clique sur la croix
 document.getElementById('popup-close').addEventListener('click', closePopup);
+
+// Fonction pour réinitialiser les erreurs du formulaire
+function resetFormErrors() {
+    // Supprimer les bordures rouges des champs
+    id.classList.remove("input-error");
+    name.classList.remove("input-error");
+}
